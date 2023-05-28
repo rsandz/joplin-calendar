@@ -1,0 +1,6 @@
+# Ignore artifacts:
+dist
+publish
+
+# Ignore all HTML files:
+*.html

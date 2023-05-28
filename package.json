@@ -1,0 +1,44 @@
+{
+  "name": "joplin-plugin-calendar",
+  "version": "1.0.0",
+  "scripts": {
+    "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
+    "prepare": "husky install && npm run dist",
+    "update": "npm install -g generator-joplin && yo joplin --update"
+  },
+  "license": "MIT",
+  "keywords": [
+    "joplin-plugin"
+  ],
+  "files": [
+    "publish"
+  ],
+  "devDependencies": {
+    "@types/node": "^14.0.14",
+    "@types/styled-components": "^5.1.26",
+    "chalk": "^4.1.0",
+    "copy-webpack-plugin": "^6.1.0",
+    "fs-extra": "^9.0.1",
+    "glob": "^7.1.6",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "on-build-webpack": "^0.1.0",
+    "prettier": "2.8.8",
+    "tar": "^6.0.5",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "yargs": "^16.2.0"
+  },
+  "dependencies": {
+    "@types/react": "^18.2.7",
+    "moment": "^2.29.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^5.3.11"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
