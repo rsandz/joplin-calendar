@@ -5,7 +5,8 @@
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "husky install && npm run dist",
     "update": "npm install -g generator-joplin && yo joplin --update",
-    "watch": "npx npm-watch"
+    "watch": "npx npm-watch",
+    "test": "jest"
   },
   "license": "MIT",
   "keywords": [
@@ -15,6 +16,8 @@
     "publish"
   ],
   "devDependencies": {
+    "@testing-library/react": "^14.0.0",
+    "@types/jest": "^29.5.1",
     "@types/node": "^14.0.14",
     "@types/styled-components": "^5.1.26",
     "chalk": "^4.1.0",
@@ -22,13 +25,17 @@
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
     "lint-staged": "^13.2.2",
     "npm-watch": "^0.11.0",
     "on-build-webpack": "^0.1.0",
     "prettier": "2.8.8",
+    "react-test-renderer": "^18.2.0",
     "tar": "^6.0.5",
+    "ts-jest": "^29.1.0",
     "ts-loader": "^7.0.5",
-    "typescript": "^3.9.3",
+    "typescript": "^5.0.4",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "yargs": "^16.2.0"
