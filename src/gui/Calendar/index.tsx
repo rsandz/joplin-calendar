@@ -48,17 +48,19 @@ function Calendar({ initialDate }: CalendarProps) {
   return (
     <div>
       <CalendarTable>
-        <CalendarControls
-          currentDate={currentDate}
-          onNextMonthClicked={() =>
-            setDate(currentDate.clone().add(1, "month"))
-          }
-          onPreviousMonthClicked={() =>
-            setDate(currentDate.clone().add(-1, "month"))
-          }
-        />
-        <CalendarHeader />
-        {...calendarBody}
+        <thead>
+          <CalendarControls
+            currentDate={currentDate}
+            onNextMonthClicked={() =>
+              setDate(currentDate.clone().add(1, "month"))
+            }
+            onPreviousMonthClicked={() =>
+              setDate(currentDate.clone().add(-1, "month"))
+            }
+          />
+          <CalendarHeader />
+        </thead>
+        <tbody>{...calendarBody}</tbody>
       </CalendarTable>
     </div>
   );
