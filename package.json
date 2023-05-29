@@ -4,7 +4,8 @@
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "husky install && npm run dist",
-    "update": "npm install -g generator-joplin && yo joplin --update"
+    "update": "npm install -g generator-joplin && yo joplin --update",
+    "watch": "npx npm-watch"
   },
   "license": "MIT",
   "keywords": [
@@ -22,6 +23,7 @@
     "glob": "^7.1.6",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
+    "npm-watch": "^0.11.0",
     "on-build-webpack": "^0.1.0",
     "prettier": "2.8.8",
     "tar": "^6.0.5",
@@ -40,5 +42,13 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "watch": {
+    "dist": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "ts,tsx"
+    }
   }
 }
