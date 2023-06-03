@@ -10,6 +10,22 @@ describe("calendar", () => {
     render(<Calendar initialDate={date} />);
 
     expect(screen.getByText("May, 2023")).toBeDefined();
+
+    const cells = screen.getAllByRole("cell");
+    expect(cells).toHaveLength(35); // 7 days * 5 rows
+
+    // Assert April
+    expect(cells[0].textContent).toEqual("30");
+
+    // Assert May
+    for (let i = 1; i <= 31; i++) {
+      expect(cells[i].textContent).toEqual(i.toString());
+    }
+
+    // Assert June
+    for (let i = 1; i <= 3; i++) {
+      expect(cells[i + 31].textContent).toEqual(i.toString());
+    }
   });
 
   it("can navigate to next month", () => {

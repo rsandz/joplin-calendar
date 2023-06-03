@@ -37,7 +37,7 @@ function Calendar({ initialDate }: CalendarProps) {
   for (let row = 0; row < CALENDAR_ROWS; row++) {
     const cols: React.JSX.Element[] = [];
     for (let col = 0; col < DAYS_IN_A_WEEK; col++) {
-      const day = workingDate.format("DD");
+      const day = workingDate.format("D");
       const inCurrentMonth = currentDate.month() === workingDate.month();
       workingDate.add(1, "day");
       cols.push(<CalendarCell day={day} muted={!inCurrentMonth} />);
