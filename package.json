@@ -16,6 +16,7 @@
     "publish"
   ],
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^4.29.9",
     "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.5.1",
     "@types/node": "^14.0.14",
@@ -41,6 +42,7 @@
     "yargs": "^16.2.0"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.29.12",
     "@types/react": "^18.2.7",
     "moment": "^2.29.4",
     "react": "^18.2.0",
