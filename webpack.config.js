@@ -194,6 +194,7 @@ const pluginConfig = Object.assign({}, baseConfig, {
   resolve: {
     alias: {
       api: path.resolve(__dirname, "api"),
+      "@constants": path.resolve(__dirname, "src", "constants"),
     },
     // JSON files can also be required from scripts so we include this.
     // https://github.com/joplin/plugin-bibtex/pull/2
@@ -228,6 +229,7 @@ const extraScriptConfig = Object.assign({}, baseConfig, {
   resolve: {
     alias: {
       api: path.resolve(__dirname, "api"),
+      "@constants": path.resolve(__dirname, "src", "constants"),
     },
     extensions: [".js", ".tsx", ".ts", ".json"],
   },
