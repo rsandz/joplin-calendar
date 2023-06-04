@@ -5,7 +5,7 @@
 
 This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which also helps track notes created on each day.
 
-
+![Showcase](./images/showcase.png)
 
 ## Building the plugin
 
