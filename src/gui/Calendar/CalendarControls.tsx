@@ -47,13 +47,13 @@ const CalendarDate = styled.p`
 `;
 
 export interface CalendarControlsProps {
-  currentDate: moment.Moment;
+  shownMonth: moment.Moment;
   onNextMonthClicked: () => void;
   onPreviousMonthClicked: () => void;
 }
 
 function CalendarControls({
-  currentDate,
+  shownMonth,
   onNextMonthClicked,
   onPreviousMonthClicked,
 }: CalendarControlsProps) {
@@ -64,7 +64,7 @@ function CalendarControls({
           <CalendarNavButton onClick={onPreviousMonthClicked}>
             &lt;
           </CalendarNavButton>
-          <CalendarDate>{currentDate.format("MMM, YYYY")}</CalendarDate>
+          <CalendarDate>{shownMonth.format("MMM, YYYY")}</CalendarDate>
           <CalendarNavButton onClick={onNextMonthClicked}>
             &gt;
           </CalendarNavButton>
