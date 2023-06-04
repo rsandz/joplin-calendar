@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import Calendar from "..";
 import moment from "moment";
 import { act } from "react-dom/test-utils";
@@ -52,5 +53,28 @@ describe("calendar", () => {
     });
 
     expect(screen.getByText("Apr, 2023")).toBeDefined();
+  });
+
+  it("highlights the currently selected date", () => {
+    const date = moment("May-29-2023", "MMMM-DD-YYYY");
+    render(<Calendar initialDate={date} />);
+
+    const dateCell = screen.getByText("29");
+
+    expect(dateCell).toHaveStyle(
+      "background-color: var(--joplin-background-color-hover3)"
+    );
+  });
+
+  it("triggers onDataSelect callback when date cell clicked", () => {
+    const date = moment("May-29-2023", "MMMM-DD-YYYY");
+    const onDateSelectCb = jest.fn();
+    render(<Calendar initialDate={date} onDateSelect={onDateSelectCb} />);
+
+    act(() => {
+      screen.getByText("28").click();
+    });
+
+    expect(onDateSelectCb).toHaveBeenCalled();
   });
 });

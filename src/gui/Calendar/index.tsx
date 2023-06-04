@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import CalendarControls from "./CalendarControls";
 import CalendarCell from "./CalendarCell";
@@ -16,14 +16,25 @@ const CalendarTable = styled.table`
 
 interface CalendarProps {
   initialDate: moment.Moment;
+  onDateSelect?: (date: moment.Moment) => void;
 }
 
 /**
  * Creates the calendar to display.
  */
-function Calendar({ initialDate }: CalendarProps) {
-  const [currentDate, setDate] = useState<moment.Moment>(initialDate.clone());
-  const currentMonthFirstDay = currentDate.startOf("month");
+function Calendar({ initialDate, onDateSelect }: CalendarProps) {
+  const [shownMonth, setShownMonth] = useState(initialDate);
+  const [selectedDate, setSelectedDate] = useState(initialDate);
+
+  const onDateCellSelected = useCallback(
+    (date: moment.Moment) => {
+      onDateSelect?.(date);
+      setSelectedDate(date);
+    },
+    [onDateSelect, setSelectedDate]
+  );
+
+  const currentMonthFirstDay = shownMonth.startOf("month");
 
   const calendarBody: React.JSX.Element[] = [];
   const firstRowOffset = -currentMonthFirstDay.weekday();
@@ -37,10 +48,16 @@ function Calendar({ initialDate }: CalendarProps) {
   for (let row = 0; row < CALENDAR_ROWS; row++) {
     const cols: React.JSX.Element[] = [];
     for (let col = 0; col < DAYS_IN_A_WEEK; col++) {
-      const day = workingDate.format("D");
-      const inCurrentMonth = currentDate.month() === workingDate.month();
+      const inCurrentMonth = shownMonth.month() === workingDate.month();
+      cols.push(
+        <CalendarCell
+          date={workingDate.clone()}
+          muted={!inCurrentMonth}
+          selected={selectedDate.isSame(workingDate, "date")}
+          onSelect={onDateCellSelected}
+        />
+      );
       workingDate.add(1, "day");
-      cols.push(<CalendarCell day={day} muted={!inCurrentMonth} />);
     }
     calendarBody.push(<tr>{...cols}</tr>);
   }
@@ -50,13 +67,15 @@ function Calendar({ initialDate }: CalendarProps) {
       <CalendarTable>
         <thead>
           <CalendarControls
-            currentDate={currentDate}
-            onNextMonthClicked={() =>
-              setDate(currentDate.clone().add(1, "month"))
-            }
-            onPreviousMonthClicked={() =>
-              setDate(currentDate.clone().add(-1, "month"))
-            }
+            shownMonth={shownMonth}
+            onNextMonthClicked={() => {
+              const newDate = shownMonth.clone().add(1, "month");
+              setShownMonth(newDate);
+            }}
+            onPreviousMonthClicked={() => {
+              const newDate = shownMonth.clone().add(-1, "month");
+              setShownMonth(newDate);
+            }}
           />
           <CalendarHeader />
         </thead>
