@@ -1,8 +1,9 @@
 /**
  * Types for messages used to communicate between webview and plugin.
  */
-enum MsgType {
+export enum MsgType {
   GetNotes,
+  OpenNote,
 }
 
 export default MsgType;
