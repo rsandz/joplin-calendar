@@ -11,20 +11,26 @@ const CALENDAR_ROWS = 5;
 const CalendarTable = styled.table`
   margin-top: 0.5rem;
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
 `;
 
 interface CalendarProps {
   initialDate: moment.Moment;
+  currentDay?: moment.Moment;
   onDateSelect?: (date: moment.Moment) => void;
 }
 
 /**
  * Creates the calendar to display.
  */
-function Calendar({ initialDate, onDateSelect }: CalendarProps) {
+function Calendar({
+  initialDate,
+  currentDay: currentDayProp,
+  onDateSelect,
+}: CalendarProps) {
   const [shownMonth, setShownMonth] = useState(initialDate);
   const [selectedDate, setSelectedDate] = useState(initialDate);
+  const currentDay = currentDayProp ?? moment();
 
   const onDateCellSelected = useCallback(
     (date: moment.Moment) => {
@@ -54,6 +60,7 @@ function Calendar({ initialDate, onDateSelect }: CalendarProps) {
           date={workingDate.clone()}
           muted={!inCurrentMonth}
           selected={selectedDate.isSame(workingDate, "date")}
+          currentDay={currentDay.isSame(workingDate, "date")}
           onSelect={onDateCellSelected}
         />
       );

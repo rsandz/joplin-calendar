@@ -55,7 +55,8 @@ describe("calendar", () => {
     expect(screen.getByText("Apr, 2023")).toBeDefined();
   });
 
-  it("highlights the currently selected date", () => {
+  // Broken because of https://github.com/testing-library/jest-dom/issues/322
+  it.skip("highlights the currently selected date", () => {
     const date = moment("May-29-2023", "MMMM-DD-YYYY");
     render(<Calendar initialDate={date} />);
 
@@ -64,6 +65,16 @@ describe("calendar", () => {
     expect(dateCell).toHaveStyle(
       "background-color: var(--joplin-background-color-hover3)"
     );
+  });
+
+  // Broken because of https://github.com/testing-library/jest-dom/issues/322
+  it.skip("adds a border to the current day", () => {
+    const date = moment("May-29-2023", "MMMM-DD-YYYY");
+    render(<Calendar initialDate={date} currentDay={date} />);
+
+    const dateCell = screen.getByText("29");
+
+    expect(dateCell).toHaveStyle("border: var(--joplin-color-correct)");
   });
 
   it("triggers onDataSelect callback when date cell clicked", () => {
