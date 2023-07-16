@@ -5,6 +5,7 @@ import MsgType from "@constants/messageTypes";
 import Note from "@constants/Note";
 import NoteListItem from "./NoteListItem";
 import styled from "styled-components";
+import { PluginPostMessage as PluginPostData } from "@constants/pluginMessageTypes";
 
 const NoteListContainer = styled.ul`
   padding: 0;
@@ -17,7 +18,7 @@ export interface NoteListProps {
 function NoteList(props: NoteListProps) {
   const currentDate = props.currentDate.clone();
 
-  const { isSuccess, data } = useQuery<Note[]>({
+  const { isSuccess, data, refetch } = useQuery<Note[]>({
     queryKey: ["notes", currentDate.toISOString()],
     queryFn: async () => {
       console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
@@ -26,6 +27,17 @@ function NoteList(props: NoteListProps) {
         currentDate: currentDate.toISOString(),
       });
     },
+  });
+
+  webviewApi.onMessage((data: PluginPostData) => {
+    const message = data.message;
+    if (message.type === MsgType.NoteChanged) {
+      refetch();
+    } else {
+      console.error(
+        `Unknown plugin message received: ${JSON.stringify(message)}`
+      );
+    }
   });
 
   const onNoteClick = useCallback(

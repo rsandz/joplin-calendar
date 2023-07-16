@@ -4,6 +4,7 @@
 export enum MsgType {
   GetNotes,
   OpenNote,
+  NoteChanged,
 }
 
 export default MsgType;
