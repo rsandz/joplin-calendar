@@ -2,7 +2,7 @@
   "name": "joplin-plugin-calendar",
   "version": "1.0.0-pre-release-2",
   "scripts": {
-    "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
+    "dist": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "husky install && npm run dist",
     "update": "npm install -g generator-joplin && yo joplin --update",
     "watch": "npx npm-watch",
