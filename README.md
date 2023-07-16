@@ -7,6 +7,23 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 
 ![Showcase](./images/showcase.png)
 
+# Usage
+
+- The plugin contains a calendar and a notes list.
+- Clicking on a calendar date shows the notes created on that date.
+- Navigate to the notes by clicking on the titles in the notes list.
+
+> **Info**
+> The create date for a note can be manuall change by clicking on the "🛈" button.
+
+## Keyboard Shortcuts
+
+| Action              | Default Shortcut  |
+| ------------------- | ----------------- |
+| Toggle the Calendar | CmdOrCtrl+Shift+` |
+
+# Development
+
 ## Building the plugin
 
 The plugin is built using Webpack, which creates the compiled code in `/dist`. A JPL archive will also be created at the root, which can use to distribute the plugin.
