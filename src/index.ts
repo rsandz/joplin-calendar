@@ -1,6 +1,7 @@
 import joplin from "api";
 import handlePanelMessage from "./handlers/PanelMessageHandler";
 import { notifyNoteChanged } from "./handlers/JoplinEventHandlers";
+import { registerCommands } from "./commands";
 
 joplin.plugins.register({
   onStart: async function () {
@@ -10,5 +11,6 @@ joplin.plugins.register({
     await joplin.workspace.onNoteSelectionChange(() =>
       notifyNoteChanged(panel)
     );
+    registerCommands(panel);
   },
 });
