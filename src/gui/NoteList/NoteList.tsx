@@ -6,9 +6,34 @@ import Note from "@constants/Note";
 import NoteListItem from "./NoteListItem";
 import styled from "styled-components";
 import { PluginPostMessage as PluginPostData } from "@constants/pluginMessageTypes";
+import ButtonBar from "../StyledComponents/ButtonBar";
+import Button from "../StyledComponents/Button";
+import PlainText from "../StyledComponents/PlainText";
 
 const NoteListContainer = styled.ul`
   padding: 0;
+`;
+
+const ButtonBarContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+`;
+
+const DateButtonBar = styled(ButtonBar)`
+  flex-grow: 1;
+`;
+
+const TodayButton = styled(Button)`
+  flex-grow: 0;
+`;
+
+const NoteListDate = styled(PlainText)`
+  flex-grow: 2;
+  flex-basis: 50%;
+  font-weight: bold;
+  text-align: center;
+  font-size: var(--joplin-font-size);
 `;
 
 export interface NoteListProps {
@@ -55,11 +80,22 @@ function NoteList(props: NoteListProps) {
     noteItems = data.map((note) => (
       <NoteListItem note={note} onNoteClick={onNoteClick} />
     ));
+
+    if (noteItems.length === 0) {
+      noteItems.push(<PlainText>No Notes Found</PlainText>);
+    }
   }
 
   return (
     <>
-      <h1>{currentDate.format("MMM D, YYYY")}</h1>
+      <ButtonBarContainer>
+        <DateButtonBar>
+          <Button>&lt;</Button>
+          <NoteListDate>{currentDate.format("MMM D, YYYY")}</NoteListDate>
+          <Button>&gt;</Button>
+        </DateButtonBar>
+        <TodayButton>Today</TodayButton>
+      </ButtonBarContainer>
       <NoteListContainer>{noteItems}</NoteListContainer>
     </>
   );
