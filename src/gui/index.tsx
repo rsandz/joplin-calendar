@@ -46,17 +46,19 @@ function App() {
   );
 }
 
-const StyledApp = styled(App)`
+const AppStyler = styled.div`
   background-color: var(--joplin-background-color);
   color: var(--joplin-color);
   font-size: var(--joplin-font-size);
   font-family: var(--joplin-font-family);
+  margin: 0.25rem 0.5rem 0.25rem 0.5rem;
 `;
 
-let root = document.getElementById("root");
-if (!root) {
-  root = document.createElement("div");
-  document.body.appendChild(root);
-}
+const root = document.getElementById("joplin-plugin-content");
 
-render(<App />, root);
+render(
+  <AppStyler>
+    <App />
+  </AppStyler>,
+  root
+);
