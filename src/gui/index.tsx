@@ -10,14 +10,38 @@ const queryClient = new QueryClient();
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(moment());
+  const [shownMonth, setShownMonth] = useState(moment());
   return (
     <QueryClientProvider client={queryClient}>
       <Calendar
-        initialDate={selectedDate}
+        selectedDate={selectedDate}
+        shownMonth={shownMonth}
         onDateSelect={(date) => setSelectedDate(date)}
+        onNextMonthClick={() => {
+          setShownMonth(shownMonth.clone().add(1, "month"));
+        }}
+        onPreviousMonthClick={() => {
+          setShownMonth(shownMonth.clone().subtract(1, "month"));
+        }}
       />
       <hr />
-      <NoteList currentDate={selectedDate} />
+      <NoteList
+        currentDate={selectedDate}
+        onNextDayClick={() => {
+          const newDate = selectedDate.clone().add(1, "day");
+          setSelectedDate(newDate);
+          setShownMonth(newDate);
+        }}
+        onPreviousDayClick={() => {
+          const newDate = selectedDate.clone().subtract(1, "day");
+          setSelectedDate(newDate);
+          setShownMonth(newDate);
+        }}
+        onTodayClick={() => {
+          setSelectedDate(moment());
+          setShownMonth(moment());
+        }}
+      />
     </QueryClientProvider>
   );
 }

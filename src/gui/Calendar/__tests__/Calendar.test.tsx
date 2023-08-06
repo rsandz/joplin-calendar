@@ -8,12 +8,12 @@ import { act } from "react-dom/test-utils";
 describe("calendar", () => {
   it("displays dates correctly", () => {
     const date = moment("May-29-2023", "MMM-DD-YYYY");
-    render(<Calendar initialDate={date} />);
+    render(<Calendar selectedDate={date} />);
 
     expect(screen.getByText("May, 2023")).toBeDefined();
 
     const cells = screen.getAllByRole("cell");
-    expect(cells).toHaveLength(35); // 7 days * 5 rows
+    expect(cells).toHaveLength(42); // 7 days * 6 rows
 
     // Assert April
     expect(cells[0].textContent).toEqual("30");
@@ -24,14 +24,17 @@ describe("calendar", () => {
     }
 
     // Assert June
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 10; i++) {
       expect(cells[i + 31].textContent).toEqual(i.toString());
     }
   });
 
-  it("can navigate to next month", () => {
+  it("calls callback when next month clicked", () => {
+    const nextMonthCallback = jest.fn();
     const date = moment("May-29-2023", "MMM-DD-YYYY");
-    render(<Calendar initialDate={date} />);
+    render(
+      <Calendar selectedDate={date} onNextMonthClick={nextMonthCallback} />
+    );
 
     const nextMonthButton = screen.getByRole("button", { name: ">" });
 
@@ -39,12 +42,18 @@ describe("calendar", () => {
       nextMonthButton.click();
     });
 
-    expect(screen.getByText("Jun, 2023")).toBeDefined();
+    expect(nextMonthCallback).toBeCalled();
   });
 
-  it("can navigate to previous month", () => {
+  it("calls callback when previous month clicked", () => {
+    const previousMonthCallback = jest.fn();
     const date = moment("May-29-2023", "MMM-DD-YYYY");
-    render(<Calendar initialDate={date} />);
+    render(
+      <Calendar
+        selectedDate={date}
+        onPreviousMonthClick={previousMonthCallback}
+      />
+    );
 
     const previousMonthButton = screen.getByRole("button", { name: "<" });
 
@@ -52,13 +61,13 @@ describe("calendar", () => {
       previousMonthButton.click();
     });
 
-    expect(screen.getByText("Apr, 2023")).toBeDefined();
+    expect(previousMonthCallback).toBeCalled();
   });
 
   // Broken because of https://github.com/testing-library/jest-dom/issues/322
   it.skip("highlights the currently selected date", () => {
     const date = moment("May-29-2023", "MMMM-DD-YYYY");
-    render(<Calendar initialDate={date} />);
+    render(<Calendar selectedDate={date} />);
 
     const dateCell = screen.getByText("29");
 
@@ -70,7 +79,7 @@ describe("calendar", () => {
   // Broken because of https://github.com/testing-library/jest-dom/issues/322
   it.skip("adds a border to the current day", () => {
     const date = moment("May-29-2023", "MMMM-DD-YYYY");
-    render(<Calendar initialDate={date} currentDay={date} />);
+    render(<Calendar selectedDate={date} currentDay={date} />);
 
     const dateCell = screen.getByText("29");
 
@@ -80,7 +89,7 @@ describe("calendar", () => {
   it("triggers onDataSelect callback when date cell clicked", () => {
     const date = moment("May-29-2023", "MMMM-DD-YYYY");
     const onDateSelectCb = jest.fn();
-    render(<Calendar initialDate={date} onDateSelect={onDateSelectCb} />);
+    render(<Calendar selectedDate={date} onDateSelect={onDateSelectCb} />);
 
     act(() => {
       screen.getByText("28").click();
