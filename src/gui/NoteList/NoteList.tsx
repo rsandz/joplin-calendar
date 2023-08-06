@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import MsgType from "@constants/messageTypes";
 import Note from "@constants/Note";
 import NoteListItem from "./NoteListItem";
@@ -9,6 +9,9 @@ import { PluginPostMessage as PluginPostData } from "@constants/pluginMessageTyp
 import ButtonBar from "../StyledComponents/ButtonBar";
 import Button from "../StyledComponents/Button";
 import PlainText from "../StyledComponents/PlainText";
+import { FaRegClock } from "react-icons/fa6";
+import SortButtonBar, { SortBy, SortDirection } from "./SortButtonBar";
+import { toNumber } from "lodash";
 
 const NoteListContainer = styled.ul`
   padding: 0;
@@ -41,11 +44,18 @@ export interface NoteListProps {
   onNextDayClick?: () => void;
   onPreviousDayClick?: () => void;
   onTodayClick?: () => void;
+  defaultSortBy?: SortBy;
+  defaultSortDirection?: SortDirection;
 }
 
 function NoteList(props: NoteListProps) {
   const currentDate = props.currentDate.clone();
   const { onNextDayClick, onPreviousDayClick, onTodayClick } = props;
+
+  const [sortBy, setSortBy] = useState<SortBy>(props.defaultSortBy ?? "time");
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    props.defaultSortDirection ?? "ascending"
+  );
 
   const { isSuccess, data, refetch } = useQuery<Note[]>({
     queryKey: ["notes", currentDate.toISOString()],
@@ -79,11 +89,28 @@ function NoteList(props: NoteListProps) {
     [MsgType.OpenNote]
   );
 
+  let sortCompareFunction: (a: Note, b: Note) => number;
+  if (sortBy === "time") {
+    if (sortDirection === "ascending") {
+      sortCompareFunction = (a, b) =>
+        toNumber(a.createdTime) - toNumber(b.createdTime);
+    } else {
+      sortCompareFunction = (a, b) =>
+        toNumber(b.createdTime) - toNumber(a.createdTime);
+    }
+  } else if (sortBy === "alphabetical") {
+    if (sortDirection === "ascending") {
+      sortCompareFunction = (a, b) => a.title.localeCompare(b.title);
+    } else {
+      sortCompareFunction = (a, b) => b.title.localeCompare(a.title);
+    }
+  }
+
   let noteItems: React.JSX.Element[] = [];
   if (isSuccess) {
-    noteItems = data.map((note) => (
-      <NoteListItem note={note} onNoteClick={onNoteClick} />
-    ));
+    noteItems = data
+      .sort(sortCompareFunction)
+      .map((note) => <NoteListItem note={note} onNoteClick={onNoteClick} />);
 
     if (noteItems.length === 0) {
       noteItems.push(<PlainText>No Notes Found</PlainText>);
@@ -99,6 +126,12 @@ function NoteList(props: NoteListProps) {
           <Button onClick={onNextDayClick}>&gt;</Button>
         </DateButtonBar>
         <TodayButton onClick={onTodayClick}>Today</TodayButton>
+        <SortButtonBar
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSortByClick={setSortBy}
+          onSortDirectionClick={setSortDirection}
+        />
       </ButtonBarContainer>
       <NoteListContainer>{noteItems}</NoteListContainer>
     </>
