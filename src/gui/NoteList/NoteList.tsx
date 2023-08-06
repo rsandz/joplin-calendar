@@ -38,10 +38,14 @@ const NoteListDate = styled(PlainText)`
 
 export interface NoteListProps {
   currentDate: moment.Moment;
+  onNextDayClick?: () => void;
+  onPreviousDayClick?: () => void;
+  onTodayClick?: () => void;
 }
 
 function NoteList(props: NoteListProps) {
   const currentDate = props.currentDate.clone();
+  const { onNextDayClick, onPreviousDayClick, onTodayClick } = props;
 
   const { isSuccess, data, refetch } = useQuery<Note[]>({
     queryKey: ["notes", currentDate.toISOString()],
@@ -90,11 +94,11 @@ function NoteList(props: NoteListProps) {
     <>
       <ButtonBarContainer>
         <DateButtonBar>
-          <Button>&lt;</Button>
+          <Button onClick={onPreviousDayClick}>&lt;</Button>
           <NoteListDate>{currentDate.format("MMM D, YYYY")}</NoteListDate>
-          <Button>&gt;</Button>
+          <Button onClick={onNextDayClick}>&gt;</Button>
         </DateButtonBar>
-        <TodayButton>Today</TodayButton>
+        <TodayButton onClick={onTodayClick}>Today</TodayButton>
       </ButtonBarContainer>
       <NoteListContainer>{noteItems}</NoteListContainer>
     </>
