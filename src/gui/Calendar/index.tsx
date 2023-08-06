@@ -6,7 +6,7 @@ import CalendarCell from "./CalendarCell";
 import CalendarHeader from "./CalendarHeader";
 
 const DAYS_IN_A_WEEK = 7;
-const CALENDAR_ROWS = 5;
+const CALENDAR_ROWS = 6;
 
 const CalendarTable = styled.table`
   margin-top: 0.5rem;
@@ -15,29 +15,35 @@ const CalendarTable = styled.table`
 `;
 
 interface CalendarProps {
-  initialDate: moment.Moment;
+  selectedDate: moment.Moment;
+  shownMonth?: moment.Moment;
   currentDay?: moment.Moment;
   onDateSelect?: (date: moment.Moment) => void;
+  onNextMonthClick?: () => void;
+  onPreviousMonthClick?: () => void;
 }
 
 /**
  * Creates the calendar to display.
  */
 function Calendar({
-  initialDate,
+  selectedDate,
+  shownMonth: shownMonthProp,
   currentDay: currentDayProp,
   onDateSelect,
+  onNextMonthClick,
+  onPreviousMonthClick,
 }: CalendarProps) {
-  const [shownMonth, setShownMonth] = useState(initialDate);
-  const [selectedDate, setSelectedDate] = useState(initialDate);
-  const currentDay = currentDayProp ?? moment();
+  const currentDay = currentDayProp ? currentDayProp.clone() : moment();
+  const shownMonth = shownMonthProp
+    ? shownMonthProp.clone()
+    : selectedDate.clone();
 
   const onDateCellSelected = useCallback(
     (date: moment.Moment) => {
       onDateSelect?.(date);
-      setSelectedDate(date);
     },
-    [onDateSelect, setSelectedDate]
+    [onDateSelect]
   );
 
   const currentMonthFirstDay = shownMonth.startOf("month");
@@ -75,14 +81,8 @@ function Calendar({
         <thead>
           <CalendarControls
             shownMonth={shownMonth}
-            onNextMonthClicked={() => {
-              const newDate = shownMonth.clone().add(1, "month");
-              setShownMonth(newDate);
-            }}
-            onPreviousMonthClicked={() => {
-              const newDate = shownMonth.clone().add(-1, "month");
-              setShownMonth(newDate);
-            }}
+            onNextMonthClicked={onNextMonthClick}
+            onPreviousMonthClicked={onPreviousMonthClick}
           />
           <CalendarHeader />
         </thead>
