@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, {
+  KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useState,
+} from "react";
 import { render } from "react-dom";
 import Calendar from "./Calendar";
 import moment from "moment";
@@ -9,8 +13,29 @@ import NoteList from "./NoteList";
 const queryClient = new QueryClient();
 
 function App() {
-  const [selectedDate, setSelectedDate] = useState(moment());
+  const [selectedDate, setSelectedDateBase] = useState(moment());
   const [shownMonth, setShownMonth] = useState(moment());
+
+  const setSelectedDate = (date: moment.Moment) => {
+    setSelectedDateBase(date);
+    setShownMonth(date);
+  };
+
+  const onCalendarKeyBoardNavigation = useCallback(
+    (event: ReactKeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        setSelectedDate(selectedDate.clone().subtract(1, "day"));
+      } else if (event.key === "ArrowRight") {
+        setSelectedDate(selectedDate.clone().add(1, "day"));
+      } else if (event.key === "ArrowUp") {
+        setSelectedDate(selectedDate.clone().subtract(1, "week"));
+      } else if (event.key === "ArrowDown") {
+        setSelectedDate(selectedDate.clone().add(1, "week"));
+      }
+    },
+    [selectedDate, setSelectedDate]
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <Calendar
@@ -23,6 +48,7 @@ function App() {
         onPreviousMonthClick={() => {
           setShownMonth(shownMonth.clone().subtract(1, "month"));
         }}
+        onKeyboardNavigation={onCalendarKeyBoardNavigation}
       />
       <hr />
       <NoteList
@@ -30,16 +56,13 @@ function App() {
         onNextDayClick={() => {
           const newDate = selectedDate.clone().add(1, "day");
           setSelectedDate(newDate);
-          setShownMonth(newDate);
         }}
         onPreviousDayClick={() => {
           const newDate = selectedDate.clone().subtract(1, "day");
           setSelectedDate(newDate);
-          setShownMonth(newDate);
         }}
         onTodayClick={() => {
           setSelectedDate(moment());
-          setShownMonth(moment());
         }}
       />
     </QueryClientProvider>

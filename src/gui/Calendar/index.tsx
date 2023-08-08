@@ -1,5 +1,9 @@
 import moment from "moment";
-import React, { useCallback, useState } from "react";
+import React, {
+  KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useState,
+} from "react";
 import styled from "styled-components";
 import CalendarControls from "./CalendarControls";
 import CalendarCell from "./CalendarCell";
@@ -21,6 +25,7 @@ interface CalendarProps {
   onDateSelect?: (date: moment.Moment) => void;
   onNextMonthClick?: () => void;
   onPreviousMonthClick?: () => void;
+  onKeyboardNavigation?: (event: ReactKeyboardEvent) => void;
 }
 
 /**
@@ -33,6 +38,7 @@ function Calendar({
   onDateSelect,
   onNextMonthClick,
   onPreviousMonthClick,
+  onKeyboardNavigation,
 }: CalendarProps) {
   const currentDay = currentDayProp ? currentDayProp.clone() : moment();
   const shownMonth = shownMonthProp
@@ -44,6 +50,13 @@ function Calendar({
       onDateSelect?.(date);
     },
     [onDateSelect]
+  );
+
+  const onKeyDown = useCallback(
+    (event: ReactKeyboardEvent) => {
+      onKeyboardNavigation(event);
+    },
+    [onKeyboardNavigation]
   );
 
   const currentMonthFirstDay = shownMonth.startOf("month");
@@ -76,7 +89,7 @@ function Calendar({
   }
 
   return (
-    <div>
+    <div tabIndex={0} style={{ outline: "none" }} onKeyDown={onKeyDown}>
       <CalendarTable>
         <thead>
           <CalendarControls
