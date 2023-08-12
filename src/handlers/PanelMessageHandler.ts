@@ -62,6 +62,9 @@ async function handlePanelMessage(message) {
       openNote(message.id);
       return;
 
+    case MsgType.GetSelectedNote:
+      return await joplin.workspace.selectedNote();
+
     default:
       throw new Error(`Could not process message: ${message}`);
   }

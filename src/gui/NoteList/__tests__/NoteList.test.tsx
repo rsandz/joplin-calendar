@@ -1,19 +1,21 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import NoteList from "../NoteList";
+import NoteList from "..";
 import moment from "moment";
 import { act } from "react-dom/test-utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@testing-library/jest-dom/extend-expect";
+import MsgType from "@constants/messageTypes";
 
 const DOCUMENT_FOLLOWING = 4;
 
 const postMessageMock = jest.fn();
+const onMessageMock = jest.fn();
 
 // Mock Webview Api in global scope
 global.webviewApi = {
   postMessage: postMessageMock,
-  onMessage: jest.fn(),
+  onMessage: onMessageMock,
 };
 
 const queryClient = new QueryClient();
@@ -26,14 +28,28 @@ function wrapper(children: React.JSX.Element) {
 describe("NoteList", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    postMessageMock.mockImplementation(async () => {
-      return Promise.resolve([
-        {
+    postMessageMock.mockImplementation((payload) => {
+      if (payload.type === MsgType.GetNotes) {
+        return Promise.resolve([
+          {
+            id: "testId",
+            title: "Test Title",
+            createdTime: "1",
+          },
+          {
+            id: "testId2",
+            title: "Test Title 2",
+            createdTime: "2",
+          },
+        ]);
+      } else if (payload.type === MsgType.OpenNote) {
+        return Promise.resolve();
+      } else if (payload.type === MsgType.GetSelectedNote)
+        return Promise.resolve({
           id: "testId",
           title: "Test Title",
           createdTime: "1",
-        },
-      ]);
+        });
     });
   });
 
@@ -47,6 +63,48 @@ describe("NoteList", () => {
     render(wrapper(<NoteList currentDate={moment()} />));
     await waitFor(() =>
       expect(screen.getByText("No Notes Found")).toBeDefined()
+    );
+  });
+
+  it("handles note change correctly", async () => {
+    render(wrapper(<NoteList currentDate={moment()} />));
+
+    expect(onMessageMock).toBeCalled();
+    const onMessageCb = onMessageMock.mock.lastCall[0];
+
+    postMessageMock.mockImplementation((payload) => {
+      if (payload.type === MsgType.GetNotes) {
+        return Promise.resolve([
+          {
+            id: "testId",
+            title: "Test Title",
+            createdTime: "1",
+          },
+          {
+            id: "testId2",
+            title: "Test Title 2",
+            createdTime: "2",
+          },
+        ]);
+      } else if (payload.type === MsgType.OpenNote) {
+        return Promise.resolve();
+      } else if (payload.type === MsgType.GetSelectedNote)
+        return Promise.resolve({
+          id: "testId2",
+        });
+    });
+
+    act(() => {
+      onMessageCb({
+        message: {
+          type: MsgType.NoteChanged,
+        },
+      });
+    });
+    await waitFor(() => expect(screen.getByText("Test Title")).toBeDefined());
+
+    expect(screen.getByText("Test Title 2").parentElement).toHaveStyle(
+      "background-color: var(--joplin-background-color-hover3);"
     );
   });
 

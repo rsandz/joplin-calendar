@@ -3,6 +3,7 @@
  */
 export enum MsgType {
   GetNotes,
+  GetSelectedNote,
   OpenNote,
   NoteChanged,
 }

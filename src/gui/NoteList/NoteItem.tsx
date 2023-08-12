@@ -1,9 +1,9 @@
 import Note from "@constants/Note";
-import React, { useCallback } from "react";
-import styled from "styled-components";
+import React from "react";
+import styled, { css } from "styled-components";
 import { escape } from "lodash";
 
-const NoteItemContainer = styled.li`
+const NoteItemContainer = styled.li<{ selected?: boolean }>`
   display: flex;
   padding: 0 0 0 0.5rem;
 
@@ -14,6 +14,12 @@ const NoteItemContainer = styled.li`
   &:hover {
     background-color: var(--joplin-background-color-hover3);
   }
+
+  ${({ selected }) =>
+    selected &&
+    css`
+      background-color: var(--joplin-background-color-hover3);
+    `}
 `;
 
 const Title = styled.h4`
@@ -24,19 +30,16 @@ const Title = styled.h4`
 
 export interface NoteListItemProps {
   note: Note;
-  onNoteClick?: (note: Note) => void;
+  onNoteClick?: () => void;
+  isSelected?: boolean;
 }
 
-function NoteListItem({ note, onNoteClick }: NoteListItemProps) {
-  const handleOnClick = useCallback(() => {
-    onNoteClick?.(note);
-  }, [note, onNoteClick]);
-
+function NoteItem({ note, onNoteClick, isSelected }: NoteListItemProps) {
   return (
-    <NoteItemContainer onClick={handleOnClick}>
+    <NoteItemContainer onClick={onNoteClick} selected={isSelected}>
       <Title>{escape(note.title)}</Title>
     </NoteItemContainer>
   );
 }
 
-export default NoteListItem;
+export default NoteItem;

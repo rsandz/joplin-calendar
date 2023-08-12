@@ -1,21 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import moment from "moment";
-import React, { useCallback, useState } from "react";
-import MsgType from "@constants/messageTypes";
-import Note from "@constants/Note";
-import NoteListItem from "./NoteListItem";
-import styled from "styled-components";
-import { PluginPostMessage as PluginPostData } from "@constants/pluginMessageTypes";
-import ButtonBar from "../StyledComponents/ButtonBar";
-import Button from "../StyledComponents/Button";
-import PlainText from "../StyledComponents/PlainText";
-import { FaRegClock } from "react-icons/fa6";
+import React, { useEffect, useState } from "react";
 import SortButtonBar, { SortBy, SortDirection } from "./SortButtonBar";
-import { toNumber } from "lodash";
-
-const NoteListContainer = styled.ul`
-  padding: 0;
-`;
+import Button from "../StyledComponents/Button";
+import styled from "styled-components";
+import ButtonBar from "../StyledComponents/ButtonBar";
+import PlainText from "../StyledComponents/PlainText";
+import Note from "@constants/Note";
+import MsgType from "@constants/messageTypes";
+import { useQuery } from "@tanstack/react-query";
+import NoteListItems from "./NoteListItems";
+import { PluginPostMessage } from "@constants/pluginMessageTypes";
 
 const ButtonBarContainer = styled.div`
   display: flex;
@@ -57,7 +50,7 @@ function NoteList(props: NoteListProps) {
     props.defaultSortDirection ?? "ascending"
   );
 
-  const { isSuccess, data, refetch } = useQuery<Note[]>({
+  const { data, refetch } = useQuery<Note[]>({
     queryKey: ["notes", currentDate.toISOString()],
     queryFn: async () => {
       console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
@@ -68,54 +61,24 @@ function NoteList(props: NoteListProps) {
     },
   });
 
-  webviewApi.onMessage((data: PluginPostData) => {
-    const message = data.message;
-    if (message.type === MsgType.NoteChanged) {
-      refetch();
-    } else {
-      console.error(
-        `Unknown plugin message received: ${JSON.stringify(message)}`
-      );
-    }
-  });
-
-  const onNoteClick = useCallback(
-    async (note: Note) => {
-      await webviewApi.postMessage({
-        type: MsgType.OpenNote,
-        id: note.id,
+  const { data: selectedNote, refetch: refetchSelectedNote } = useQuery<Note>({
+    queryKey: ["selectedNote"],
+    queryFn: async () => {
+      return await webviewApi.postMessage({
+        type: MsgType.GetSelectedNote,
       });
     },
-    [MsgType.OpenNote]
-  );
+  });
 
-  let sortCompareFunction: (a: Note, b: Note) => number;
-  if (sortBy === "time") {
-    if (sortDirection === "ascending") {
-      sortCompareFunction = (a, b) =>
-        toNumber(a.createdTime) - toNumber(b.createdTime);
-    } else {
-      sortCompareFunction = (a, b) =>
-        toNumber(b.createdTime) - toNumber(a.createdTime);
-    }
-  } else if (sortBy === "alphabetical") {
-    if (sortDirection === "ascending") {
-      sortCompareFunction = (a, b) => a.title.localeCompare(b.title);
-    } else {
-      sortCompareFunction = (a, b) => b.title.localeCompare(a.title);
-    }
-  }
-
-  let noteItems: React.JSX.Element[] = [];
-  if (isSuccess) {
-    noteItems = data
-      .sort(sortCompareFunction)
-      .map((note) => <NoteListItem note={note} onNoteClick={onNoteClick} />);
-
-    if (noteItems.length === 0) {
-      noteItems.push(<PlainText>No Notes Found</PlainText>);
-    }
-  }
+  useEffect(() => {
+    webviewApi.onMessage((data: PluginPostMessage) => {
+      const message = data.message;
+      if (message.type === MsgType.NoteChanged) {
+        refetch();
+        refetchSelectedNote();
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -133,7 +96,13 @@ function NoteList(props: NoteListProps) {
           onSortDirectionClick={setSortDirection}
         />
       </ButtonBarContainer>
-      <NoteListContainer>{noteItems}</NoteListContainer>
+      <NoteListItems
+        notes={data ?? []}
+        selectedNoteId={selectedNote?.id}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        key={currentDate.toISOString()}
+      />
     </>
   );
 }
