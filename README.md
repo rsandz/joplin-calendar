@@ -18,9 +18,19 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 
 ## Keyboard Shortcuts
 
+### Joplin Wide
+
 | Action              | Default Shortcut  |
 | ------------------- | ----------------- |
 | Toggle the Calendar | CmdOrCtrl+Shift+` |
+
+### After clicking on Calendar
+
+- Use the arrow key to move between dates.
+
+### After clicking on the note list
+
+- Use up and down arrow keys to select notes.
 
 # Development
 
