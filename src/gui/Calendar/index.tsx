@@ -123,6 +123,8 @@ function Calendar({
         );
       }
 
+      numberOfDots = Math.min(numberOfDots, 4);
+
       cols.push(
         <CalendarCell
           date={workingDate.clone()}
