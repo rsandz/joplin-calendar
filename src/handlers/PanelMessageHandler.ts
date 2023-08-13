@@ -1,7 +1,8 @@
-import { camelCase } from "lodash";
+import { camelCase, create } from "lodash";
 import joplin from "api";
 import MsgType from "@constants/messageTypes";
 import moment from "moment";
+import MonthStatistics from "@constants/MonthStatistics";
 
 function convertSnakeCaseKeysToCamelCase(object: any) {
   return Object.entries(object).reduce((newObj, [key, value]) => {
@@ -23,8 +24,6 @@ async function getDayNotes(date: moment.Moment) {
   const createdFromDate = date.format("YYYYMMDD");
   const createdToDate = date.add(1, "day").format("YYYYMMDD");
 
-  console.debug(`Fetching notes from ${createdFromDate} to ${createdToDate}`);
-
   let page = 1;
   let paginatedResponse: Record<string, any>;
   do {
@@ -36,8 +35,43 @@ async function getDayNotes(date: moment.Moment) {
     notes.push(...paginatedResponse.items);
   } while (paginatedResponse.has_more);
 
-  console.debug(`Parsed ${page} pages of notes.`);
   return notes.map(convertSnakeCaseKeysToCamelCase);
+}
+
+async function getMonthStatistics(
+  date: moment.Moment
+): Promise<MonthStatistics> {
+  const timeRemovedDate = date.startOf("day");
+  const createdFromDate = timeRemovedDate.clone().startOf("month");
+  const workingDate = createdFromDate.clone();
+  const createdToDate = timeRemovedDate.clone().endOf("month");
+
+  console.debug(`Fetching stats from ${createdFromDate} to ${createdToDate}`);
+
+  const monthNotesPromises: Record<string, Promise<any>> = {};
+  while (!workingDate.isAfter(createdToDate)) {
+    monthNotesPromises[workingDate.format("L")] = getDayNotes(
+      workingDate.clone()
+    );
+    workingDate.add(1, "day");
+  }
+
+  const monthNotes = {};
+  for (const [key, promise] of Object.entries(monthNotesPromises)) {
+    monthNotes[key] = await promise;
+  }
+
+  // Convert to statistics
+  const notesPerDay = {};
+  for (const [key, notes] of Object.entries(monthNotes)) {
+    notesPerDay[key] = (notes as any[]).length;
+  }
+
+  const monthStats = {
+    notesPerDay,
+  };
+
+  return monthStats;
 }
 
 /**
@@ -64,6 +98,9 @@ async function handlePanelMessage(message) {
 
     case MsgType.GetSelectedNote:
       return await joplin.workspace.selectedNote();
+
+    case MsgType.GetMonthStatistics:
+      return await getMonthStatistics(moment(message.date, moment.ISO_8601));
 
     default:
       throw new Error(`Could not process message: ${message}`);
