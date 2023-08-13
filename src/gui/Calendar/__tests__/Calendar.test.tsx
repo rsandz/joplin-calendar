@@ -4,8 +4,30 @@ import "@testing-library/jest-dom";
 import Calendar from "..";
 import moment from "moment";
 import { act } from "react-dom/test-utils";
+import useGetMonthStatistics from "../../hooks/useGetMonthStatistics";
+import useWebviewApiOnMessage from "../../hooks/useWebViewApiOnMessage";
+
+jest.mock("../../hooks/useGetMonthStatistics");
+const mockedUseGetMonthStatistics = jest.mocked(useGetMonthStatistics);
+
+global.webviewApi = {
+  postMessage: jest.fn(),
+  onMessage: jest.fn(),
+};
+
+jest.mock("../../hooks/useWebViewApiOnMessage");
+const mockedUseWebviewApiOnMessage = jest.mocked(useWebviewApiOnMessage);
 
 describe("calendar", () => {
+  beforeEach(() => {
+    mockedUseGetMonthStatistics.mockReturnValue({
+      data: {
+        notesPerDay: {},
+      },
+      refetch: jest.fn(),
+    });
+  });
+
   it("displays dates correctly", () => {
     const date = moment("May-29-2023", "MMM-DD-YYYY");
     render(<Calendar selectedDate={date} />);

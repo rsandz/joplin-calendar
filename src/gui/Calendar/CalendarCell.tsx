@@ -1,6 +1,7 @@
 import moment from "moment";
 import React, { useCallback } from "react";
 import styled, { css } from "styled-components";
+import DotBar from "../DotBar/DotBar";
 
 const StyledCell = styled.td<{
   muted?: boolean;
@@ -43,6 +44,7 @@ export interface CalendarCellProps {
   muted?: boolean;
   selected?: boolean;
   currentDay?: boolean;
+  numberOfDots?: number;
   onSelect?: (date: moment.Moment) => void;
 }
 
@@ -51,6 +53,7 @@ function CalendarCell({
   muted,
   selected,
   currentDay,
+  numberOfDots,
   onSelect,
 }: CalendarCellProps) {
   const onClickCallback = useCallback(() => {
@@ -65,6 +68,7 @@ function CalendarCell({
       currentDay={currentDay}
     >
       {date.format("D")}
+      <DotBar numberOfDots={numberOfDots ?? 0} />
     </StyledCell>
   );
 }
