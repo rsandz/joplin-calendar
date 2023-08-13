@@ -9,6 +9,7 @@ import MsgType from "@constants/messageTypes";
 import { useQuery } from "@tanstack/react-query";
 import NoteListItems from "./NoteListItems";
 import { PluginPostMessage } from "@constants/pluginMessageTypes";
+import useWebviewApiOnMessage from "../hooks/useWebViewApiOnMessage";
 
 const ButtonBarContainer = styled.div`
   display: flex;
@@ -70,15 +71,13 @@ function NoteList(props: NoteListProps) {
     },
   });
 
-  useEffect(() => {
-    webviewApi.onMessage((data: PluginPostMessage) => {
-      const message = data.message;
-      if (message.type === MsgType.NoteChanged) {
-        refetch();
-        refetchSelectedNote();
-      }
-    });
-  }, []);
+  useWebviewApiOnMessage((data) => {
+    const message = data.message;
+    if (message.type === MsgType.NoteChanged) {
+      refetch();
+      refetchSelectedNote();
+    }
+  });
 
   return (
     <>
