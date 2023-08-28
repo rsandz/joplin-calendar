@@ -9,12 +9,33 @@ import moment from "moment";
 import styled from "styled-components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NoteList from "./NoteList";
+import useGetMonthStatistics from "./hooks/useGetMonthStatistics";
 
 const queryClient = new QueryClient();
 
 function App() {
   const [selectedDate, setSelectedDateBase] = useState(moment());
   const [shownMonth, setShownMonth] = useState(moment());
+
+  const previousMonth = shownMonth.clone().subtract(1, "month");
+  const nextMonth = shownMonth.clone().add(1, "month");
+
+  const { data: previousMonthStats, refetch: refetchPreviousMonthStats } =
+    useGetMonthStatistics(previousMonth.clone());
+  const { data: shownMonthStats, refetch: refetchShownMonthStats } =
+    useGetMonthStatistics(shownMonth.clone());
+  const { data: nextMonthStats, refetch: refetchNextMonthStats } =
+    useGetMonthStatistics(nextMonth.clone());
+
+  let statistics: Record<string, number> = {};
+
+  if (previousMonthStats && shownMonthStats && nextMonthStats) {
+    statistics = {
+      ...previousMonthStats.notesPerDay,
+      ...shownMonthStats.notesPerDay,
+      ...nextMonthStats.notesPerDay,
+    };
+  }
 
   const setSelectedDate = (date: moment.Moment) => {
     setSelectedDateBase(date);
@@ -37,10 +58,11 @@ function App() {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <Calendar
         selectedDate={selectedDate}
         shownMonth={shownMonth}
+        statistics={statistics}
         onDateSelect={(date) => setSelectedDate(date)}
         onNextMonthClick={() => {
           setShownMonth(shownMonth.clone().add(1, "month"));
@@ -65,7 +87,7 @@ function App() {
           setSelectedDate(moment());
         }}
       />
-    </QueryClientProvider>
+    </>
   );
 }
 
@@ -80,8 +102,10 @@ const AppStyler = styled.div`
 const root = document.getElementById("joplin-plugin-content");
 
 render(
-  <AppStyler>
-    <App />
-  </AppStyler>,
+  <QueryClientProvider client={queryClient}>
+    <AppStyler>
+      <App />
+    </AppStyler>
+  </QueryClientProvider>,
   root
 );
