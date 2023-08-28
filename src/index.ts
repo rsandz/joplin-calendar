@@ -1,7 +1,13 @@
 import joplin from "api";
 import handlePanelMessage from "./handlers/PanelMessageHandler";
 import { notifyNoteChanged } from "./handlers/JoplinEventHandlers";
-import { registerCommands } from "./commands";
+import { TOGGLE_CALENDAR_COMMAND, registerCommands } from "./commands";
+import { ToolbarButtonLocation } from "api/types";
+import {
+  onShowCalendarButtonChange,
+  registerSettings,
+  triggerAllSettingsCallbacks,
+} from "./settings";
 
 joplin.plugins.register({
   onStart: async function () {
@@ -11,6 +17,20 @@ joplin.plugins.register({
     await joplin.workspace.onNoteSelectionChange(() =>
       notifyNoteChanged(panel)
     );
-    registerCommands(panel);
+
+    await registerCommands(panel);
+    await registerSettings();
+
+    onShowCalendarButtonChange(async (value) => {
+      if (value) {
+        await joplin.views.toolbarButtons.create(
+          "calendarToggleButton",
+          TOGGLE_CALENDAR_COMMAND,
+          ToolbarButtonLocation.NoteToolbar
+        );
+      }
+    });
+
+    await triggerAllSettingsCallbacks();
   },
 });
