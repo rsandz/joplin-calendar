@@ -5,6 +5,7 @@ export enum MsgType {
   GetNotes,
   GetSelectedNote,
   GetMonthStatistics,
+  GetNearestDayWithNote,
   OpenNote,
   NoteChanged,
 }

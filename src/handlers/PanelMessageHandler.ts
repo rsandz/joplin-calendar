@@ -3,16 +3,31 @@ import joplin from "api";
 import MsgType from "@constants/messageTypes";
 import moment from "moment";
 import MonthStatistics from "@constants/MonthStatistics";
+import { GetNearestDayWithNoteResponse } from "@constants/GetNearestDayWithNote";
+import Note from "@constants/Note";
 
-function convertSnakeCaseKeysToCamelCase(object: any) {
+function transformUserCreatedTimeToCreatedTime(note: any) {
+  note.created_time = note.user_created_time;
+  delete note.user_created_time;
+  return note;
+}
+
+function convertSnakeCaseKeysToCamelCase(object: any): Note {
   return Object.entries(object).reduce((newObj, [key, value]) => {
     newObj[camelCase(key)] = value;
     return newObj;
-  }, {});
+  }, {}) as Note;
 }
 
 async function openNote(id: string) {
   joplin.commands.execute("openNote", id);
+}
+
+function convertEpochDateInNoteToIsoString(note: Note): Note {
+  return {
+    ...note,
+    createdTime: moment(note.createdTime).toISOString(),
+  };
 }
 
 /**
@@ -36,6 +51,41 @@ async function getDayNotes(date: moment.Moment) {
   } while (paginatedResponse.has_more);
 
   return notes.map(convertSnakeCaseKeysToCamelCase);
+}
+
+async function getNearestDayWithNote(
+  startDate: moment.Moment,
+  direction: "future" | "past"
+): Promise<GetNearestDayWithNoteResponse | null> {
+  const date = startDate.clone();
+  let queryString = "";
+  if (direction === "past") {
+    queryString = `-created:${date.format("YYYYMMDD")}`;
+  } else {
+    queryString = `created:${date.add(1, "day").format("YYYYMMDD")}`;
+  }
+
+  const response = await joplin.data.get(["search"], {
+    fields: ["id", "title", "user_created_time"],
+    limit: 1,
+    order_by: "user_created_time",
+    order_dir: direction === "past" ? "DESC" : "ASC",
+    query: queryString,
+  });
+
+  if (response.items.length === 0) {
+    return null;
+  }
+
+  let note = response.items[0];
+  note = transformUserCreatedTimeToCreatedTime(note);
+  note = convertSnakeCaseKeysToCamelCase(note);
+  const transformedNote = convertEpochDateInNoteToIsoString(note);
+
+  return {
+    date: transformedNote.createdTime,
+    note: transformedNote,
+  };
 }
 
 async function getMonthStatistics(
@@ -101,6 +151,12 @@ async function handlePanelMessage(message) {
 
     case MsgType.GetMonthStatistics:
       return await getMonthStatistics(moment(message.date, moment.ISO_8601));
+
+    case MsgType.GetNearestDayWithNote:
+      return await getNearestDayWithNote(
+        moment(message.date, moment.ISO_8601),
+        message.direction
+      );
 
     default:
       throw new Error(`Could not process message: ${message}`);
