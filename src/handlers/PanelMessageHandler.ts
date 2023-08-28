@@ -43,14 +43,17 @@ async function getDayNotes(date: moment.Moment) {
   let paginatedResponse: Record<string, any>;
   do {
     paginatedResponse = await joplin.data.get(["search"], {
-      fields: ["id", "title", "created_time"],
+      fields: ["id", "title", "user_created_time"],
       query: `created:${createdFromDate} -created:${createdToDate}`,
       page: page,
     });
     notes.push(...paginatedResponse.items);
   } while (paginatedResponse.has_more);
 
-  return notes.map(convertSnakeCaseKeysToCamelCase);
+  return notes
+    .map(transformUserCreatedTimeToCreatedTime)
+    .map(convertSnakeCaseKeysToCamelCase)
+    .map(convertEpochDateInNoteToIsoString);
 }
 
 async function getNearestDayWithNote(
