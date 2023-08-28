@@ -31,6 +31,10 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 
 - Use the arrow key to move between dates.
 
+- Use Ctrl to jump between days with notes.
+  - Use Ctrl+Left or Ctrl+Up to jump to the nearest date in the past with a note.
+  - Use Ctrl+Right or Ctrl+Down to jump to the nearest date in the future with a note.
+
 ### After clicking on the note list
 
 - Use up and down arrow keys to select notes.
