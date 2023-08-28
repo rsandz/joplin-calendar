@@ -5,11 +5,16 @@ import React, {
 } from "react";
 import { render } from "react-dom";
 import Calendar from "./Calendar";
-import moment from "moment";
+import moment, { ISO_8601 } from "moment";
 import styled from "styled-components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NoteList from "./NoteList";
 import useGetMonthStatistics from "./hooks/useGetMonthStatistics";
+import {
+  GetNearestDayWithNoteRequest,
+  GetNearestDayWithNoteResponse,
+} from "@constants/GetNearestDayWithNote";
+import MsgType from "@constants/messageTypes";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +48,31 @@ function App() {
   };
 
   const onCalendarKeyBoardNavigation = useCallback(
-    (event: ReactKeyboardEvent) => {
+    async (event: ReactKeyboardEvent) => {
+      if (event.ctrlKey) {
+        let response: GetNearestDayWithNoteResponse;
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          response = await webviewApi.postMessage({
+            type: MsgType.GetNearestDayWithNote,
+            date: selectedDate.toISOString(),
+            direction: "past",
+          } as GetNearestDayWithNoteRequest);
+        } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          response = await webviewApi.postMessage({
+            type: MsgType.GetNearestDayWithNote,
+            date: selectedDate.toISOString(),
+            direction: "future",
+          } as GetNearestDayWithNoteRequest);
+        }
+
+        if (!response) {
+          return;
+        }
+
+        setSelectedDate(moment(response.date, ISO_8601));
+        return;
+      }
+
       if (event.key === "ArrowLeft") {
         setSelectedDate(selectedDate.clone().subtract(1, "day"));
       } else if (event.key === "ArrowRight") {
