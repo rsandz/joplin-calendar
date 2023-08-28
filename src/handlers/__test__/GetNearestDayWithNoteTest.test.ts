@@ -15,70 +15,74 @@ jest.mock(
 const mockedJoplin = jest.mocked(joplin);
 
 describe("GetNearestDayWithNote", () => {
+  const baselineDate = moment("1970-01-01", "YYYY-MM-DD");
+
   it("uses correct query based if direction is future", async () => {
+    const baselinePlusOneDate = baselineDate.clone().add(1, "day");
     mockedJoplin.data.get.mockResolvedValue({
       items: [
         {
           id: "testId",
           title: "testTitle",
-          user_created_time: 0,
+          user_created_time: baselinePlusOneDate.valueOf(),
         },
       ],
     });
 
     const result = await handlePanelMessage({
       type: MsgType.GetNearestDayWithNote,
-      date: moment(0).toISOString(),
+      date: baselineDate.toISOString(),
       direction: "future",
     });
 
     expect(result).toStrictEqual({
-      date: "1970-01-01T00:00:00.000Z",
+      date: baselinePlusOneDate.toISOString(),
       note: {
         id: "testId",
         title: "testTitle",
-        createdTime: "1970-01-01T00:00:00.000Z",
+        createdTime: baselinePlusOneDate.toISOString(),
       },
     });
 
     expect(mockedJoplin.data.get).toBeCalledWith(
       ["search"],
       expect.objectContaining({
-        query: "created:19700101",
+        query: `created:${baselinePlusOneDate.format("YYYYMMDD")}`,
       })
     );
   });
 
   it("uses correct query based if direction is past", async () => {
+    const baselineMinusOneDate = baselineDate.clone().subtract(1, "day");
     mockedJoplin.data.get.mockResolvedValue({
       items: [
         {
           id: "testId",
           title: "testTitle",
-          user_created_time: 0,
+          user_created_time: baselineMinusOneDate.valueOf(),
         },
       ],
     });
 
     const result = await handlePanelMessage({
       type: MsgType.GetNearestDayWithNote,
-      date: moment(0).toISOString(),
+      date: baselineDate.toISOString(),
       direction: "past",
     });
 
     expect(result).toStrictEqual({
-      date: "1970-01-01T00:00:00.000Z",
+      date: baselineMinusOneDate.toISOString(),
       note: {
         id: "testId",
         title: "testTitle",
-        createdTime: "1970-01-01T00:00:00.000Z",
+        createdTime: baselineMinusOneDate.toISOString(),
       },
     });
 
     expect(mockedJoplin.data.get).toBeCalledWith(
       ["search"],
       expect.objectContaining({
-        query: "-created:19691231",
+        query: `-created:${baselineDate.format("YYYYMMDD")}`,
       })
     );
   });
@@ -90,7 +94,7 @@ describe("GetNearestDayWithNote", () => {
 
     const result = await handlePanelMessage({
       type: MsgType.GetNearestDayWithNote,
-      date: moment(0).toISOString(),
+      date: baselineDate.toISOString(),
       direction: "past",
     });
 
