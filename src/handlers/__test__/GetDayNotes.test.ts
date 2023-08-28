@@ -36,7 +36,7 @@ describe("GetDayNotes", () => {
         {
           id: "testId",
           title: "testTitle",
-          created_date: "testCreatedDate",
+          user_created_time: 0,
         },
       ],
     }));
@@ -50,7 +50,7 @@ describe("GetDayNotes", () => {
     expect(result[0]).toEqual({
       id: "testId",
       title: "testTitle",
-      createdDate: "testCreatedDate",
+      createdTime: "1970-01-01T00:00:00.000Z",
     });
   });
 
@@ -61,7 +61,7 @@ describe("GetDayNotes", () => {
           {
             id: "testId",
             title: "testTitle",
-            created_date: "testCreatedDate",
+            user_created_time: 0,
           },
         ],
         has_more: true,
@@ -71,7 +71,7 @@ describe("GetDayNotes", () => {
           {
             id: "testId2",
             title: "testTitle2",
-            created_date: "testCreatedDate2",
+            user_created_time: 3600000,
           },
         ],
         has_more: true,
@@ -86,12 +86,12 @@ describe("GetDayNotes", () => {
     expect(result[0]).toEqual({
       id: "testId",
       title: "testTitle",
-      createdDate: "testCreatedDate",
+      createdTime: "1970-01-01T00:00:00.000Z",
     });
     expect(result[1]).toEqual({
       id: "testId2",
       title: "testTitle2",
-      createdDate: "testCreatedDate2",
+      createdTime: "1970-01-01T01:00:00.000Z",
     });
   });
 
