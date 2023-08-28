@@ -34,6 +34,8 @@ interface CalendarProps {
   selectedDate: moment.Moment;
   shownMonth?: moment.Moment;
   currentDay?: moment.Moment;
+  // Statistics map with `MM/DD/YYYY` as key and arbitrary number as value.
+  statistics?: Record<string, number>;
   onDateSelect?: (date: moment.Moment) => void;
   onNextMonthClick?: () => void;
   onPreviousMonthClick?: () => void;
@@ -47,6 +49,7 @@ function Calendar({
   selectedDate,
   shownMonth: shownMonthProp,
   currentDay: currentDayProp,
+  statistics,
   onDateSelect,
   onNextMonthClick,
   onPreviousMonthClick,
@@ -56,25 +59,6 @@ function Calendar({
   const shownMonth = shownMonthProp
     ? shownMonthProp.clone()
     : selectedDate.clone();
-
-  const previousMonth = shownMonth.clone().subtract(1, "month");
-  const nextMonth = shownMonth.clone().add(1, "month");
-
-  const { data: previousMonthStats, refetch: refetchPreviousMonthStats } =
-    useGetMonthStatistics(previousMonth.clone());
-  const { data: shownMonthStats, refetch: refetchShownMonthStats } =
-    useGetMonthStatistics(shownMonth.clone());
-  const { data: nextMonthStats, refetch: refetchNextMonthStats } =
-    useGetMonthStatistics(nextMonth.clone());
-
-  useWebviewApiOnMessage((data) => {
-    const message = data.message;
-    if (message.type === MsgType.NoteChanged) {
-      refetchPreviousMonthStats();
-      refetchShownMonthStats();
-      refetchNextMonthStats();
-    }
-  });
 
   const onDateCellSelected = useCallback(
     (date: moment.Moment) => {
@@ -104,23 +88,13 @@ function Calendar({
   for (let row = 0; row < CALENDAR_ROWS; row++) {
     const cols: React.JSX.Element[] = [];
     for (let col = 0; col < DAYS_IN_A_WEEK; col++) {
-      const inPreviousMonth = workingDate.isSame(previousMonth, "month");
       const inCurrentMonth = workingDate.isSame(shownMonth, "month");
-      const inNextMonth = workingDate.isSame(nextMonth, "month");
+      const simpleWorkingDate = workingDate.format("L");
 
       let numberOfDots = 0;
-      if (inPreviousMonth && previousMonthStats) {
-        numberOfDots = calculateNumberOfDots(
-          previousMonthStats.notesPerDay[workingDate.format("L")]
-        );
-      } else if (inCurrentMonth && shownMonthStats) {
-        numberOfDots = calculateNumberOfDots(
-          shownMonthStats.notesPerDay[workingDate.format("L")]
-        );
-      } else if (inNextMonth && nextMonthStats) {
-        numberOfDots = calculateNumberOfDots(
-          nextMonthStats.notesPerDay[workingDate.format("L")]
-        );
+
+      if (statistics && statistics[simpleWorkingDate]) {
+        numberOfDots = calculateNumberOfDots(statistics[simpleWorkingDate]);
       }
 
       numberOfDots = Math.min(numberOfDots, 4);
