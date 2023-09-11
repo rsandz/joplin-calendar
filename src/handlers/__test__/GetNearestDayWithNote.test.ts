@@ -1,7 +1,9 @@
+import NoteSearchTypes from "@constants/NoteSearchTypes";
 import handlePanelMessage from "../PanelMessageHandler";
 import MsgType from "@constants/messageTypes";
 import joplin from "api";
 import moment from "moment";
+import { getNearestDayWithModifiedNote } from "../GetNearestDayWithNote";
 
 jest.mock(
   "api",
@@ -25,6 +27,7 @@ describe("GetNearestDayWithNote", () => {
           id: "testId",
           title: "testTitle",
           user_created_time: baselinePlusOneDate.valueOf(),
+          user_updated_time: "1970-01-01T00:00:00.000Z",
         },
       ],
     });
@@ -41,6 +44,7 @@ describe("GetNearestDayWithNote", () => {
         id: "testId",
         title: "testTitle",
         createdTime: baselinePlusOneDate.toISOString(),
+        updatedTime: "1970-01-01T00:00:00.000Z",
       },
     });
 
@@ -60,6 +64,7 @@ describe("GetNearestDayWithNote", () => {
           id: "testId",
           title: "testTitle",
           user_created_time: baselineMinusOneDate.valueOf(),
+          user_updated_time: "1970-01-01T00:00:00.000Z",
         },
       ],
     });
@@ -76,6 +81,7 @@ describe("GetNearestDayWithNote", () => {
         id: "testId",
         title: "testTitle",
         createdTime: baselineMinusOneDate.toISOString(),
+        updatedTime: "1970-01-01T00:00:00.000Z",
       },
     });
 
@@ -85,6 +91,36 @@ describe("GetNearestDayWithNote", () => {
         query: `-created:${baselineDate.format("YYYYMMDD")}`,
       })
     );
+  });
+
+  it("returns correct date depending on search operator term", async () => {
+    const baselineMinusOneDate = baselineDate.clone().subtract(1, "day");
+    const baselineMinusEightDate = baselineDate.clone().subtract(8, "day");
+    mockedJoplin.data.get.mockResolvedValue({
+      items: [
+        {
+          id: "testId",
+          title: "testTitle",
+          user_created_time: baselineMinusEightDate.valueOf(),
+          user_updated_time: baselineMinusOneDate.valueOf(),
+        },
+      ],
+    });
+
+    const result = await getNearestDayWithModifiedNote(
+      baselineDate.clone(),
+      "past"
+    );
+
+    expect(result).toStrictEqual({
+      date: baselineMinusOneDate.toISOString(),
+      note: {
+        id: "testId",
+        title: "testTitle",
+        createdTime: baselineMinusEightDate.toISOString(),
+        updatedTime: baselineMinusOneDate.toISOString(),
+      },
+    });
   });
 
   it("returns null if no notes found", async () => {

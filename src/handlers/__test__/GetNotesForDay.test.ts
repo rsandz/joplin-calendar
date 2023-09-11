@@ -1,7 +1,6 @@
 import joplin from "api";
-import handlePanelMessage from "../PanelMessageHandler";
-import MsgType from "@constants/messageTypes";
 import moment from "moment";
+import { getCreatedNotesForDay } from "../GetNotesForDay";
 
 jest.mock(
   "api",
@@ -16,12 +15,9 @@ jest.mock(
 );
 const mockedJoplin = jest.mocked(joplin);
 
-describe("GetDayNotes", () => {
+describe("Get Notes For Day", () => {
   it("calls joplin api with the correct query", async () => {
-    const result = await handlePanelMessage({
-      type: MsgType.GetNotes,
-      currentDate: moment("2023-05-29").toISOString(),
-    });
+    getCreatedNotesForDay(moment("2023-05-29"));
 
     expect(mockedJoplin.data.get).toHaveBeenCalledWith(["search"], {
       fields: expect.any(Array),
@@ -37,20 +33,19 @@ describe("GetDayNotes", () => {
           id: "testId",
           title: "testTitle",
           user_created_time: 0,
+          user_updated_time: 0,
         },
       ],
     }));
 
-    const result = await handlePanelMessage({
-      type: MsgType.GetNotes,
-      currentDate: moment("2023-05-29").toISOString(),
-    });
+    const result = await getCreatedNotesForDay(moment("2023-05-29"));
 
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       id: "testId",
       title: "testTitle",
       createdTime: "1970-01-01T00:00:00.000Z",
+      updatedTime: "1970-01-01T00:00:00.000Z",
     });
   });
 
@@ -62,6 +57,7 @@ describe("GetDayNotes", () => {
             id: "testId",
             title: "testTitle",
             user_created_time: 0,
+            user_updated_time: 0,
           },
         ],
         has_more: true,
@@ -72,34 +68,26 @@ describe("GetDayNotes", () => {
             id: "testId2",
             title: "testTitle2",
             user_created_time: 3600000,
+            user_updated_time: 0,
           },
         ],
         has_more: true,
       }));
 
-    const result = await handlePanelMessage({
-      type: MsgType.GetNotes,
-      currentDate: moment("2023-05-29").toISOString(),
-    });
+    const result = await getCreatedNotesForDay(moment("2023-05-29"));
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       id: "testId",
       title: "testTitle",
       createdTime: "1970-01-01T00:00:00.000Z",
+      updatedTime: "1970-01-01T00:00:00.000Z",
     });
     expect(result[1]).toEqual({
       id: "testId2",
       title: "testTitle2",
       createdTime: "1970-01-01T01:00:00.000Z",
+      updatedTime: "1970-01-01T00:00:00.000Z",
     });
-  });
-
-  it("returns nothing if current date is not provided", async () => {
-    const result = await handlePanelMessage({
-      type: MsgType.GetNotes,
-    });
-
-    expect(result).toBeNull();
   });
 });
