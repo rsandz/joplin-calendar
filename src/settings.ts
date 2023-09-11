@@ -4,6 +4,7 @@ import { SettingItemType } from "api/types";
 const SETTINGS_SECTION_ID = "joplinCalendarSection";
 
 export const SHOW_CALENDAR_BUTTON = "showCalendarToggleOnToolbar";
+export const SHOW_MODIFIED_NOTES = "showModifiedNotes";
 
 const settingObservers: Record<string, Array<(value: any) => void>> = {};
 
@@ -18,6 +19,15 @@ export async function registerSettings() {
       label: "Show Calendar Toggle Button",
       description:
         "Show a button on the top-right of the note editor for toggling the calendar. Restart required on change.",
+      public: true,
+      type: SettingItemType.Bool,
+      value: true,
+      section: SETTINGS_SECTION_ID,
+    },
+    [SHOW_MODIFIED_NOTES]: {
+      label: "Show Modified Notes in Note List",
+      description:
+        "Show notes in the note list if their last modified day was on the same day",
       public: true,
       type: SettingItemType.Bool,
       value: true,
