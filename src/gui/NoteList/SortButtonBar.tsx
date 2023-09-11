@@ -38,18 +38,24 @@ function SortButtonBar(props: SortButtonBarProps): JSX.Element {
   const sortBy = props.sortBy ?? "time";
   const sortDirection = props.sortDirection ?? "ascending";
 
-  let sortIcon: JSX.Element;
+  let sortByIcon: JSX.Element;
+  let sortByText: string;
   if (sortBy === "time") {
-    sortIcon = <FaRegClock />;
+    sortByIcon = <FaRegClock />;
+    sortByText = "Time";
   } else if (sortBy === "alphabetical") {
-    sortIcon = <FaA />;
+    sortByIcon = <FaA />;
+    sortByText = "Alphabetical";
   }
 
   let sortDirectionIcon: JSX.Element;
+  let sortDirectionText: string;
   if (sortDirection === "ascending") {
     sortDirectionIcon = <FaArrowUpLong />;
+    sortDirectionText = "Ascending";
   } else {
     sortDirectionIcon = <FaArrowDownLong />;
+    sortDirectionText = "Descending";
   }
 
   return (
@@ -63,8 +69,9 @@ function SortButtonBar(props: SortButtonBarProps): JSX.Element {
             props.onSortByClick?.("alphabetical");
           }
         }}
+        title={`Sort by ${sortByText}`}
       >
-        {sortIcon}
+        {sortByIcon}
       </SortButton>
       <SortDirectionButton
         aria-label="sort-direction-button"
@@ -75,6 +82,7 @@ function SortButtonBar(props: SortButtonBarProps): JSX.Element {
             props.onSortDirectionClick?.("ascending");
           }
         }}
+        title={`Sort ${sortDirectionText}`}
       >
         {sortDirectionIcon}
       </SortDirectionButton>
