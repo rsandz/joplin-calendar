@@ -4,9 +4,10 @@ import { notifyNoteChanged } from "./handlers/JoplinEventHandlers";
 import { TOGGLE_CALENDAR_COMMAND, registerCommands } from "./commands";
 import { ToolbarButtonLocation } from "api/types";
 import {
-  onShowCalendarButtonChange,
   registerSettings,
   triggerAllSettingsCallbacks,
+  onSettingChange,
+  SHOW_CALENDAR_BUTTON,
 } from "./settings";
 
 joplin.plugins.register({
@@ -21,7 +22,7 @@ joplin.plugins.register({
     await registerCommands(panel);
     await registerSettings();
 
-    onShowCalendarButtonChange(async (value) => {
+    onSettingChange(SHOW_CALENDAR_BUTTON, async (value) => {
       if (value) {
         await joplin.views.toolbarButtons.create(
           "calendarToggleButton",

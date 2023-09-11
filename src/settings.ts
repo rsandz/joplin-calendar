@@ -3,9 +3,9 @@ import { SettingItemType } from "api/types";
 
 const SETTINGS_SECTION_ID = "joplinCalendarSection";
 
-const SHOW_CALENDAR_BUTTON = "showCalendarToggleOnToolbar";
+export const SHOW_CALENDAR_BUTTON = "showCalendarToggleOnToolbar";
 
-const showCalendarButtonObservers: Array<(value: boolean) => void> = [];
+const settingObservers: Record<string, Array<(value: any) => void>> = {};
 
 export async function registerSettings() {
   await joplin.settings.registerSection(SETTINGS_SECTION_ID, {
@@ -26,22 +26,26 @@ export async function registerSettings() {
   });
 
   await joplin.settings.onChange(async ({ keys }) => {
-    if (keys.includes(SHOW_CALENDAR_BUTTON)) {
-      showCalendarButtonObservers.forEach(async (callback) => {
-        callback(await joplin.settings.value(SHOW_CALENDAR_BUTTON));
+    keys.forEach((key) => {
+      settingObservers[key]?.forEach(async (callback) => {
+        callback(await joplin.settings.value(key));
       });
-    }
+    });
   });
 }
 
 export async function triggerAllSettingsCallbacks() {
-  showCalendarButtonObservers.forEach(async (callback) => {
-    callback(await joplin.settings.value(SHOW_CALENDAR_BUTTON));
+  Object.entries(settingObservers).forEach(async ([key, callbacks]) => {
+    callbacks.forEach(async (callback) => {
+      callback(await joplin.settings.value(key));
+    });
   });
 }
 
-export async function onShowCalendarButtonChange(
-  callback: (value: boolean) => void
+export async function onSettingChange(
+  key: string,
+  callback: (value: any) => void
 ) {
-  showCalendarButtonObservers.push(callback);
+  settingObservers[key] = settingObservers[key] || [];
+  settingObservers[key].push(callback);
 }
