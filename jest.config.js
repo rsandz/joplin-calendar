@@ -4,6 +4,6 @@ module.exports = {
   testEnvironment: "jsdom",
   collectCoverage: true,
   moduleNameMapper: {
-    "@constants/messageTypes": "<rootDir>/src/constants/messageTypes",
+    "@constants/(.*)": "<rootDir>/src/constants/$1",
   },
 };
