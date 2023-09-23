@@ -66,7 +66,7 @@ export async function getNearestDayWithCreatedNote(
   );
 }
 
-async function getNearestDayWithModifiedNote(
+export async function getNearestDayWithModifiedNote(
   startDate: moment.Moment,
   direction: "future" | "past"
 ): Promise<GetNearestDayWithNoteResponse | null> {
