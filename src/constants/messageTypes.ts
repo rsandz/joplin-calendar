@@ -8,6 +8,7 @@ export enum MsgType {
   GetNearestDayWithNote,
   OpenNote,
   NoteChanged,
+  SettingChanged,
 }
 
 export default MsgType;

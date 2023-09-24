@@ -1,10 +1,9 @@
 import joplin from "api";
 import { SettingItemType } from "api/types";
+import MsgType from "@constants/messageTypes";
+import { SHOW_CALENDAR_BUTTON, SHOW_MODIFIED_NOTES } from "@constants/Settings";
 
 const SETTINGS_SECTION_ID = "joplinCalendarSection";
-
-export const SHOW_CALENDAR_BUTTON = "showCalendarToggleOnToolbar";
-export const SHOW_MODIFIED_NOTES = "showModifiedNotes";
 
 const settingObservers: Record<string, Array<(value: any) => void>> = {};
 
@@ -58,4 +57,22 @@ export async function onSettingChange(
 ) {
   settingObservers[key] = settingObservers[key] || [];
   settingObservers[key].push(callback);
+}
+
+/**
+ * Post a SettingsChanged message to webview whenever settings change.
+ *
+ * @param handle The handle of the webview
+ * @param key The key of the setting that changed
+ *
+ * @see {MsgType.SettingsChanged} For post message type.
+ */
+export async function onSettingChangeAlertPanel(handle: string, key: string) {
+  await onSettingChange(key, (value) => {
+    joplin.views.panels.postMessage(handle, {
+      type: MsgType.SettingChanged,
+      key,
+      value,
+    });
+  });
 }
