@@ -123,7 +123,7 @@ describe("NoteList", () => {
     );
 
     act(() => {
-      screen.getByText(">").click();
+      screen.getByRole("button", { name: "note-list-next" }).click();
     });
 
     expect(nextDayCb).toBeCalled();
@@ -138,7 +138,7 @@ describe("NoteList", () => {
     );
 
     act(() => {
-      screen.getByText("<").click();
+      screen.getByRole("button", { name: "note-list-previous" }).click();
     });
 
     expect(prevDayCb).toBeCalled();

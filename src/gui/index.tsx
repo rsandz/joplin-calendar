@@ -16,8 +16,44 @@ import {
 } from "@constants/GetNearestDayWithNote";
 import MsgType from "@constants/messageTypes";
 import useNoteSearchTypes from "./hooks/useNoteSearchTypes";
+import NoteSearchTypes from "@constants/NoteSearchTypes";
 
 const queryClient = new QueryClient();
+
+async function getNearestFutureDayWithNote(
+  selectedDate: moment.Moment,
+  noteSearchTypes: NoteSearchTypes[]
+): Promise<moment.Moment | null> {
+  const response = await webviewApi.postMessage({
+    type: MsgType.GetNearestDayWithNote,
+    date: selectedDate.toISOString(),
+    direction: "future",
+    noteSearchTypes,
+  } as GetNearestDayWithNoteRequest);
+
+  if (!response) {
+    return null;
+  }
+
+  return moment(response.date, ISO_8601);
+}
+
+async function getNearestPastDayWithNote(
+  selectedDate: moment.Moment,
+  noteSearchTypes: NoteSearchTypes[]
+): Promise<moment.Moment | null> {
+  const response = await webviewApi.postMessage({
+    type: MsgType.GetNearestDayWithNote,
+    date: selectedDate.toISOString(),
+    direction: "past",
+  } as GetNearestDayWithNoteRequest);
+
+  if (!response) {
+    return null;
+  }
+
+  return moment(response.date, ISO_8601);
+}
 
 function App() {
   const [selectedDate, setSelectedDateBase] = useState(moment());
@@ -53,28 +89,21 @@ function App() {
   const onCalendarKeyBoardNavigation = useCallback(
     async (event: ReactKeyboardEvent) => {
       if (event.ctrlKey) {
-        let response: GetNearestDayWithNoteResponse;
+        let date: moment.Moment | null;
         if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-          response = await webviewApi.postMessage({
-            type: MsgType.GetNearestDayWithNote,
-            date: selectedDate.toISOString(),
-            direction: "past",
-            noteSearchTypes,
-          } as GetNearestDayWithNoteRequest);
+          date = await getNearestPastDayWithNote(selectedDate, noteSearchTypes);
         } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-          response = await webviewApi.postMessage({
-            type: MsgType.GetNearestDayWithNote,
-            date: selectedDate.toISOString(),
-            direction: "future",
-            noteSearchTypes,
-          } as GetNearestDayWithNoteRequest);
+          date = await getNearestFutureDayWithNote(
+            selectedDate,
+            noteSearchTypes
+          );
         }
 
-        if (!response) {
+        if (!date) {
           return;
         }
 
-        setSelectedDate(moment(response.date, ISO_8601));
+        setSelectedDate(date);
         return;
       }
 
@@ -101,8 +130,14 @@ function App() {
         onNextMonthClick={() => {
           setShownMonth(shownMonth.clone().add(1, "month"));
         }}
+        onNextYearClick={() => {
+          setShownMonth(shownMonth.clone().add(1, "year"));
+        }}
         onPreviousMonthClick={() => {
           setShownMonth(shownMonth.clone().subtract(1, "month"));
+        }}
+        onPreviousYearClick={() => {
+          setShownMonth(shownMonth.clone().subtract(1, "year"));
         }}
         onKeyboardNavigation={onCalendarKeyBoardNavigation}
       />
@@ -113,9 +148,29 @@ function App() {
           const newDate = selectedDate.clone().add(1, "day");
           setSelectedDate(newDate);
         }}
+        onNextNoteDayClick={async () => {
+          let date = await getNearestFutureDayWithNote(
+            selectedDate,
+            noteSearchTypes
+          );
+          if (!date) {
+            return;
+          }
+          setSelectedDate(date);
+        }}
         onPreviousDayClick={() => {
           const newDate = selectedDate.clone().subtract(1, "day");
           setSelectedDate(newDate);
+        }}
+        onPreviousNoteDayClick={async () => {
+          let date = await getNearestPastDayWithNote(
+            selectedDate,
+            noteSearchTypes
+          );
+          if (!date) {
+            return;
+          }
+          setSelectedDate(date);
         }}
         onTodayClick={() => {
           setSelectedDate(moment());

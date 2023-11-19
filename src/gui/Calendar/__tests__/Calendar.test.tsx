@@ -58,7 +58,9 @@ describe("calendar", () => {
       <Calendar selectedDate={date} onNextMonthClick={nextMonthCallback} />
     );
 
-    const nextMonthButton = screen.getByRole("button", { name: ">" });
+    const nextMonthButton = screen.getByRole("button", {
+      name: "calendar-next",
+    });
 
     act(() => {
       nextMonthButton.click();
@@ -77,7 +79,9 @@ describe("calendar", () => {
       />
     );
 
-    const previousMonthButton = screen.getByRole("button", { name: "<" });
+    const previousMonthButton = screen.getByRole("button", {
+      name: "calendar-previous",
+    });
 
     act(() => {
       previousMonthButton.click();

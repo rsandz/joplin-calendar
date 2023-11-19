@@ -12,6 +12,12 @@ import useWebviewApiOnMessage from "../hooks/useWebViewApiOnMessage";
 import useNoteSearchTypes from "../hooks/useNoteSearchTypes";
 import NoteSearchTypes from "@constants/NoteSearchTypes";
 import moment from "moment";
+import useControlHeld from "../hooks/useControlHeld";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaRightToBracket,
+} from "react-icons/fa6";
 
 const ButtonBarContainer = styled.div`
   display: flex;
@@ -43,15 +49,24 @@ const NoteTypeHeader = styled(PlainText)`
 export interface NoteListProps {
   currentDate: moment.Moment;
   onNextDayClick?: () => void;
+  onNextNoteDayClick?: () => void;
   onPreviousDayClick?: () => void;
+  onPreviousNoteDayClick?: () => void;
   onTodayClick?: () => void;
   defaultSortBy?: SortBy;
   defaultSortDirection?: SortDirection;
 }
 
 function NoteList(props: NoteListProps) {
+  const controlHeld = useControlHeld();
   const currentDate = props.currentDate.clone();
-  const { onNextDayClick, onPreviousDayClick, onTodayClick } = props;
+  const {
+    onNextDayClick,
+    onNextNoteDayClick,
+    onPreviousDayClick,
+    onPreviousNoteDayClick,
+    onTodayClick,
+  } = props;
 
   const [sortBy, setSortBy] = useState<SortBy>(props.defaultSortBy ?? "time");
   const [sortDirection, setSortDirection] = useState<SortDirection>(
@@ -112,9 +127,23 @@ function NoteList(props: NoteListProps) {
     <>
       <ButtonBarContainer>
         <DateButtonBar>
-          <Button onClick={onPreviousDayClick}>&lt;</Button>
+          <Button
+            onClick={controlHeld ? onPreviousNoteDayClick : onPreviousDayClick}
+            aria-label="note-list-previous"
+          >
+            {controlHeld ? (
+              <FaRightToBracket className="fa-rotate-180" />
+            ) : (
+              <FaChevronLeft />
+            )}
+          </Button>
           <NoteListDate>{currentDate.format("MMM D, YYYY")}</NoteListDate>
-          <Button onClick={onNextDayClick}>&gt;</Button>
+          <Button
+            onClick={controlHeld ? onNextNoteDayClick : onNextDayClick}
+            aria-label="note-list-next"
+          >
+            {controlHeld ? <FaRightToBracket /> : <FaChevronRight />}
+          </Button>
         </DateButtonBar>
         <TodayButton onClick={onTodayClick}>Today</TodayButton>
         <SortButtonBar

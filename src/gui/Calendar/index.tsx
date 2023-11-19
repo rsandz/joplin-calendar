@@ -38,7 +38,9 @@ interface CalendarProps {
   statistics?: Record<string, number>;
   onDateSelect?: (date: moment.Moment) => void;
   onNextMonthClick?: () => void;
+  onNextYearClick?: () => void;
   onPreviousMonthClick?: () => void;
+  onPreviousYearClick?: () => void;
   onKeyboardNavigation?: (event: ReactKeyboardEvent) => void;
 }
 
@@ -52,7 +54,9 @@ function Calendar({
   statistics,
   onDateSelect,
   onNextMonthClick,
+  onNextYearClick,
   onPreviousMonthClick,
+  onPreviousYearClick,
   onKeyboardNavigation,
 }: CalendarProps) {
   const currentDay = currentDayProp ? currentDayProp.clone() : moment();
@@ -121,7 +125,9 @@ function Calendar({
           <CalendarControls
             shownMonth={shownMonth}
             onNextMonthClicked={onNextMonthClick}
+            onNextYearClicked={onNextYearClick}
             onPreviousMonthClicked={onPreviousMonthClick}
+            onPreviousYearClicked={onPreviousYearClick}
           />
           <CalendarHeader />
         </thead>

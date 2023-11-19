@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
 export default styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   flex-grow: 1;
   cursor: pointer;
 
