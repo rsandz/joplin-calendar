@@ -15,6 +15,7 @@ import {
   GetNearestDayWithNoteResponse,
 } from "@constants/GetNearestDayWithNote";
 import MsgType from "@constants/messageTypes";
+import useNoteSearchTypes from "./hooks/useNoteSearchTypes";
 
 const queryClient = new QueryClient();
 
@@ -25,12 +26,14 @@ function App() {
   const previousMonth = shownMonth.clone().subtract(1, "month");
   const nextMonth = shownMonth.clone().add(1, "month");
 
+  const noteSearchTypes = useNoteSearchTypes();
+
   const { data: previousMonthStats, refetch: refetchPreviousMonthStats } =
-    useGetMonthStatistics(previousMonth.clone());
+    useGetMonthStatistics(previousMonth.clone(), noteSearchTypes);
   const { data: shownMonthStats, refetch: refetchShownMonthStats } =
-    useGetMonthStatistics(shownMonth.clone());
+    useGetMonthStatistics(shownMonth.clone(), noteSearchTypes);
   const { data: nextMonthStats, refetch: refetchNextMonthStats } =
-    useGetMonthStatistics(nextMonth.clone());
+    useGetMonthStatistics(nextMonth.clone(), noteSearchTypes);
 
   let statistics: Record<string, number> = {};
 
@@ -56,12 +59,14 @@ function App() {
             type: MsgType.GetNearestDayWithNote,
             date: selectedDate.toISOString(),
             direction: "past",
+            noteSearchTypes,
           } as GetNearestDayWithNoteRequest);
         } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
           response = await webviewApi.postMessage({
             type: MsgType.GetNearestDayWithNote,
             date: selectedDate.toISOString(),
             direction: "future",
+            noteSearchTypes,
           } as GetNearestDayWithNoteRequest);
         }
 
