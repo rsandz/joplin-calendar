@@ -1,31 +1,34 @@
-# Joplin Plugin
+# 📅 Joplin Calendar Plugin
 
-> **Warning**
-> This Plugin is currently Work-In-Progress
-
-This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which also helps track notes created on each day.
+This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which also helps track notes created and modified each day.
 
 ![Showcase](./images/showcase.png)
 
-# Features
+# ⭐ Features
 
-- The plugin contains a calendar and a notes list.
+- The plugin includes a **calendar** and a **notes list**.
+
+## 📆 Calendar
 - Clicking on a calendar date shows the notes created or updated on that date.
-  - Showing updated notes can be disabled in the settings.
-- Navigate to the notes by clicking on the titles in the notes list.
-
-> [!Tip]
-> The create date for a note can be manually change by clicking on the "🛈" button.
-
+- Clicking on the '<' and '>' buttons above the calendar moves between months.
+- Clicking on the '<' and '>' buttons above the calendar *while holding `ctrl`* moves between years.
 - Calendar dates have dots beneath them indicating the number of notes written on that day.
-
   - Each dot represents 2 notes created, up to a maximum of 4 dots.
 
-- When holding the `ctrl` key, button icons may change and will instead do the following:
-  - Clicking on the calendar buttons will move between years.
-  - Clicking on the note list buttons will move between days with notes.
+> [!Tip]
+> The create date and updated date for a note can be manually change by clicking on the "🛈" button.
 
-## Keyboard Shortcuts
+## 🗒️ Notes List
+- The notes list shows notes created and updated on the specified date.
+  - Showing updated notes can be disabled in the settings.
+- Navigate to the notes by clicking on the titles in the notes list.
+- Clicking on the '<' and '>' buttons above the notes list moves days.
+- Clicking on the '<' and '>' buttons above the notes list *while holding `ctrl`* moves between days with notes.
+- Clicking the `today` button brings back the calendar focus to the current day.
+- Notes can be sorted by time of creation, or alphabetically. The sort direction can also be changed.
+
+
+## ⌨️ Keyboard Shortcuts
 
 ### Joplin Wide
 
@@ -36,20 +39,19 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 ### After clicking on Calendar
 
 - Use the arrow key to move between dates.
-
 - Use Ctrl to jump between days with notes.
   - Use Ctrl+Left or Ctrl+Up to jump to the nearest date in the past with a note.
   - Use Ctrl+Right or Ctrl+Down to jump to the nearest date in the future with a note.
 
-### After clicking on the note list
+### After clicking on the Note List
 
 - Use up and down arrow keys to select notes.
 
-# Development
+# ⚙️ Development
 
 ## Building the plugin
 
-The plugin is built using Webpack, which creates the compiled code in `/dist`. A JPL archive will also be created at the root, which can use to distribute the plugin.
+The plugin is built using Webpack, which creates the compiled code in `/dist`. A JPL archive will also be created at the root, which can be used to distribute the plugin or test locally by loading it into Joplin.
 
 To build the plugin, simply run `npm run dist`.
 Alternatively, to automatically rebuild the plugin on source code changes, run `npm run watch`
