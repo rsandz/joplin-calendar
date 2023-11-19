@@ -10,14 +10,20 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 # Features
 
 - The plugin contains a calendar and a notes list.
-- Clicking on a calendar date shows the notes created on that date.
+- Clicking on a calendar date shows the notes created or updated on that date.
+  - Showing updated notes can be disabled in the settings.
 - Navigate to the notes by clicking on the titles in the notes list.
 
 > **Info**
 > The create date for a note can be manually change by clicking on the "🛈" button.
 
 - Calendar dates have dots beneath them indicating the number of notes written on that day.
+
   - Each dot represents 2 notes created, up to a maximum of 4 dots.
+
+- When holding the `ctrl` key, button icons may change and will instead do the following:
+  - Clicking on the calendar buttons will move between years.
+  - Clicking on the note list buttons will move between days with notes.
 
 ## Keyboard Shortcuts
 
