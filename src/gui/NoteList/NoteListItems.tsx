@@ -12,11 +12,19 @@ const NoteListContainer = styled.ul`
   outline: 0;
 `;
 
+const NoNotesText = styled(PlainText)`
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  font-size: var(--joplin-font-size);
+  font-style: italic;
+`;
+
 export interface NoteListItemsProps {
   notes: Note[];
   selectedNoteId: string;
   sortBy: SortBy;
   sortDirection: SortDirection;
+  primaryTextStrategy?: (note: Note) => string;
+  secondaryTextStrategy?: (note: Note) => string;
 }
 
 function NoteListItems(props: NoteListItemsProps) {
@@ -43,17 +51,30 @@ function NoteListItems(props: NoteListItemsProps) {
   }
 
   sortedNotes = notes.sort(sortCompareFunction);
-  noteElements = sortedNotes.map((note) => (
-    <NoteItem
-      note={note}
-      onNoteClick={() => onSelectedNoteChange(note.id)}
-      isSelected={note.id === selectedNoteId}
-      key={note.id}
-    />
-  ));
+  noteElements = sortedNotes.map((note) => {
+    let primaryText: string;
+    if (props.primaryTextStrategy) {
+      primaryText = props.primaryTextStrategy(note);
+    }
+    let secondaryText: string;
+    if (props.secondaryTextStrategy) {
+      secondaryText = props.secondaryTextStrategy(note);
+    }
+
+    return (
+      <NoteItem
+        note={note}
+        onNoteClick={() => onSelectedNoteChange(note.id)}
+        isSelected={note.id === selectedNoteId}
+        primaryText={primaryText}
+        secondaryText={secondaryText}
+        key={note.id}
+      />
+    );
+  });
 
   if (noteElements.length === 0) {
-    noteElements.push(<PlainText key="0">No Notes Found</PlainText>);
+    noteElements.push(<NoNotesText key="0">No Notes Found</NoNotesText>);
   }
 
   const onSelectedNoteChange = useCallback(

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SortButtonBar, { SortBy, SortDirection } from "./SortButtonBar";
 import Button from "../StyledComponents/Button";
 import styled from "styled-components";
@@ -8,8 +8,10 @@ import Note from "@constants/Note";
 import MsgType from "@constants/messageTypes";
 import { useQuery } from "@tanstack/react-query";
 import NoteListItems from "./NoteListItems";
-import { PluginPostMessage } from "@constants/pluginMessageTypes";
 import useWebviewApiOnMessage from "../hooks/useWebViewApiOnMessage";
+import useNoteSearchTypes from "../hooks/useNoteSearchTypes";
+import NoteSearchTypes from "@constants/NoteSearchTypes";
+import moment from "moment";
 
 const ButtonBarContainer = styled.div`
   display: flex;
@@ -33,6 +35,11 @@ const NoteListDate = styled(PlainText)`
   font-size: var(--joplin-font-size);
 `;
 
+const NoteTypeHeader = styled(PlainText)`
+  font-weight: bold;
+  font-size: calc(var(--joplin-font-size) * 1.25);
+`;
+
 export interface NoteListProps {
   currentDate: moment.Moment;
   onNextDayClick?: () => void;
@@ -51,15 +58,45 @@ function NoteList(props: NoteListProps) {
     props.defaultSortDirection ?? "ascending"
   );
 
-  const { data, refetch } = useQuery<Note[]>({
-    queryKey: ["notes", currentDate.toISOString()],
+  const noteSearchTypes = useNoteSearchTypes();
+
+  useWebviewApiOnMessage((data) => {
+    const message = data.message;
+    if (message.type === MsgType.NoteChanged) {
+      refetchCreatedNotes();
+      refetchModifiedNotes();
+      refetchSelectedNote();
+    }
+  });
+
+  const { data: createdNotesData, refetch: refetchCreatedNotes } = useQuery<
+    Note[]
+  >({
+    queryKey: ["notes", "created", currentDate.toISOString()],
     queryFn: async () => {
       console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
       return await webviewApi.postMessage({
         type: MsgType.GetNotes,
         currentDate: currentDate.toISOString(),
+        noteSearchTypes: [NoteSearchTypes.Created],
       });
     },
+    enabled: noteSearchTypes.includes(NoteSearchTypes.Created),
+  });
+
+  const { data: modifiedNotesData, refetch: refetchModifiedNotes } = useQuery<
+    Note[]
+  >({
+    queryKey: ["notes", "modified", currentDate.toISOString()],
+    queryFn: async () => {
+      console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
+      return await webviewApi.postMessage({
+        type: MsgType.GetNotes,
+        currentDate: currentDate.toISOString(),
+        noteSearchTypes: [NoteSearchTypes.Modified],
+      });
+    },
+    enabled: noteSearchTypes.includes(NoteSearchTypes.Modified),
   });
 
   const { data: selectedNote, refetch: refetchSelectedNote } = useQuery<Note>({
@@ -69,14 +106,6 @@ function NoteList(props: NoteListProps) {
         type: MsgType.GetSelectedNote,
       });
     },
-  });
-
-  useWebviewApiOnMessage((data) => {
-    const message = data.message;
-    if (message.type === MsgType.NoteChanged) {
-      refetch();
-      refetchSelectedNote();
-    }
   });
 
   return (
@@ -95,13 +124,32 @@ function NoteList(props: NoteListProps) {
           onSortDirectionClick={setSortDirection}
         />
       </ButtonBarContainer>
+      <NoteTypeHeader>Created Notes</NoteTypeHeader>
       <NoteListItems
-        notes={data ?? []}
+        notes={createdNotesData ?? []}
         selectedNoteId={selectedNote?.id}
         sortBy={sortBy}
         sortDirection={sortDirection}
-        key={currentDate.toISOString()}
+        key={`CreatedNotes:currentDate.toISOString()`}
+        primaryTextStrategy={(note) =>
+          `${moment(note.createdTime).format("LT")}`
+        }
       />
+      {noteSearchTypes.includes(NoteSearchTypes.Modified) && (
+        <>
+          <NoteTypeHeader>Modified Notes</NoteTypeHeader>
+          <NoteListItems
+            notes={modifiedNotesData ?? []}
+            selectedNoteId={selectedNote?.id}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            key={`ModifiedNotes:currentDate.toISOString()`}
+            primaryTextStrategy={(note) =>
+              `${moment(note.updatedTime).format("LT")}`
+            }
+          />
+        </>
+      )}
     </>
   );
 }

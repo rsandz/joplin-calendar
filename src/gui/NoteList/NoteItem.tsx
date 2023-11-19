@@ -1,7 +1,7 @@
 import Note from "@constants/Note";
 import React from "react";
 import styled, { css } from "styled-components";
-import { escape } from "lodash";
+import { StringNullableChain, escape, update } from "lodash";
 import PlainText from "../StyledComponents/PlainText";
 import moment from "moment";
 
@@ -61,17 +61,33 @@ export interface NoteListItemProps {
   note: Note;
   onNoteClick?: () => void;
   isSelected?: boolean;
+  primaryText?: string;
+  secondaryText?: string;
 }
 
-function NoteItem({ note, onNoteClick, isSelected }: NoteListItemProps) {
-  const time = moment(note.createdTime, moment.ISO_8601).format("LT");
-
+function NoteItem({
+  note,
+  onNoteClick,
+  isSelected,
+  primaryText,
+  secondaryText,
+}: NoteListItemProps) {
   return (
     <NoteItemContainer onClick={onNoteClick} selected={isSelected}>
       <NoteItemBody>
         <Title>{escape(note.title) || <i>Untitled</i>}</Title>
         <InfoBar>
-          <InfoText title="Time">{time}</InfoText>
+          <InfoText>
+            <b>{primaryText}</b>
+          </InfoText>
+          {secondaryText && (
+            <>
+              <InfoText> | </InfoText>
+              <InfoText>
+                <i>{secondaryText}</i>
+              </InfoText>
+            </>
+          )}
         </InfoBar>
       </NoteItemBody>
     </NoteItemContainer>

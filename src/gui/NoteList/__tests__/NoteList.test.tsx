@@ -6,6 +6,8 @@ import { act } from "react-dom/test-utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@testing-library/jest-dom/extend-expect";
 import MsgType from "@constants/messageTypes";
+import useNoteSearchTypes from "../../hooks/useNoteSearchTypes";
+import NoteSearchTypes from "@constants/NoteSearchTypes";
 
 const DOCUMENT_FOLLOWING = 4;
 
@@ -18,6 +20,9 @@ global.webviewApi = {
   onMessage: onMessageMock,
 };
 
+jest.mock("../../hooks/useNoteSearchTypes");
+const mockedUseNoteSearchTypes = jest.mocked(useNoteSearchTypes);
+
 const queryClient = new QueryClient();
 function wrapper(children: React.JSX.Element) {
   return (
@@ -28,6 +33,9 @@ function wrapper(children: React.JSX.Element) {
 describe("NoteList", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    mockedUseNoteSearchTypes.mockReturnValue([NoteSearchTypes.Created]);
+
     postMessageMock.mockImplementation((payload) => {
       if (payload.type === MsgType.GetNotes) {
         return Promise.resolve([
@@ -241,5 +249,63 @@ describe("NoteList", () => {
         .getByText("B Note")
         .compareDocumentPosition(screen.getByText("A Note"))
     ).toBe(DOCUMENT_FOLLOWING);
+  });
+
+  it("does not show modified notes if setting is disabled", async () => {
+    mockedUseNoteSearchTypes.mockReturnValue([NoteSearchTypes.Created]);
+
+    render(wrapper(<NoteList currentDate={moment()} />));
+
+    expect(screen.queryByText("Modified Notes")).toBeNull();
+    expect(screen.getByText("Created Notes")).toBeDefined();
+  });
+
+  it("shows modified notes if setting is enabled", async () => {
+    mockedUseNoteSearchTypes.mockReturnValue([
+      NoteSearchTypes.Created,
+      NoteSearchTypes.Modified,
+    ]);
+
+    render(wrapper(<NoteList currentDate={moment()} />));
+
+    expect(screen.getByText("Modified Notes")).toBeDefined();
+    expect(screen.getByText("Created Notes")).toBeDefined();
+  });
+
+  it("can show different notes in modified and created lists", async () => {
+    mockedUseNoteSearchTypes.mockReturnValue([
+      NoteSearchTypes.Created,
+      NoteSearchTypes.Modified,
+    ]);
+    postMessageMock.mockImplementation(async (options) => {
+      if (options.noteSearchTypes.includes(NoteSearchTypes.Created)) {
+        return [
+          {
+            id: "testId1",
+            title: "Created Note A",
+            createdTime: "1",
+          },
+        ];
+      }
+      if (options.noteSearchTypes.includes(NoteSearchTypes.Modified)) {
+        console.error("THIS");
+        return [
+          {
+            id: "testId2",
+            title: "Modified Note A",
+            createdTime: "2",
+          },
+        ];
+      }
+    });
+
+    render(wrapper(<NoteList currentDate={moment()} />));
+
+    await waitFor(() =>
+      expect(screen.getByText("Created Note A")).toBeDefined()
+    );
+
+    expect(screen.getAllByText("Created Note A")).toHaveLength(1);
+    expect(screen.getAllByText("Modified Note A")).toHaveLength(1);
   });
 });
