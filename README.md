@@ -14,7 +14,7 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
   - Showing updated notes can be disabled in the settings.
 - Navigate to the notes by clicking on the titles in the notes list.
 
-> **Info**
+> [!Tip]
 > The create date for a note can be manually change by clicking on the "🛈" button.
 
 - Calendar dates have dots beneath them indicating the number of notes written on that day.
