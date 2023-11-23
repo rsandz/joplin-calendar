@@ -17,6 +17,7 @@ import NoteSearchTypes from "@constants/NoteSearchTypes";
 import MonthStatistics from "@constants/MonthStatistics";
 import { GetNearestDayWithNoteResponse } from "@constants/GetNearestDayWithNote";
 import { uniqBy } from "lodash";
+import { triggerAllSettingsCallbacks } from "../settings";
 
 async function openNote(id: string) {
   joplin.commands.execute("openNote", id);
@@ -146,28 +147,38 @@ async function handleGetNearestDayWithNote(message) {
 async function handlePanelMessage(message) {
   const msgType = message.type;
   switch (msgType) {
-    case MsgType.GetNotes:
+    case MsgType.GetNotes: {
       return await handleGetNotes(message);
+    }
 
-    case MsgType.OpenNote:
+    case MsgType.OpenNote: {
       if (!message.id) {
         console.error(`Could not process message since missing id.`);
         return;
       }
       openNote(message.id);
       return;
+    }
 
-    case MsgType.GetSelectedNote:
+    case MsgType.GetSelectedNote: {
       return await joplin.workspace.selectedNote();
+    }
 
-    case MsgType.GetMonthStatistics:
+    case MsgType.GetMonthStatistics: {
       return await handleGetMonthStatistics(message);
+    }
 
-    case MsgType.GetNearestDayWithNote:
+    case MsgType.GetNearestDayWithNote: {
       return await handleGetNearestDayWithNote(message);
+    }
 
-    default:
+    case MsgType.TriggerAllSettingsCallbacks: {
+      return await triggerAllSettingsCallbacks();
+    }
+
+    default: {
       throw new Error(`Could not process message: ${message}`);
+    }
   }
 }
 
