@@ -1,6 +1,6 @@
 import NoteSearchTypes from "@constants/NoteSearchTypes";
 import MsgType from "@constants/messageTypes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useWebviewApiOnMessage from "./useWebViewApiOnMessage";
 import { SHOW_MODIFIED_NOTES } from "@constants/Settings";
 
@@ -15,6 +15,14 @@ function useNoteSearchTypes() {
   if (showModifiedNotes) {
     noteSearchTypes.push(NoteSearchTypes.Modified);
   }
+
+  // Trigger all settings callbacks once initialized
+  // to prevent any race conditions.
+  useEffect(() => {
+    webviewApi.postMessage({
+      type: MsgType.TriggerAllSettingsCallbacks,
+    });
+  }, []);
 
   useWebviewApiOnMessage((data) => {
     const message = data.message;

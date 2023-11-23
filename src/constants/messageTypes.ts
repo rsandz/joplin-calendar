@@ -9,6 +9,7 @@ export enum MsgType {
   OpenNote,
   NoteChanged,
   SettingChanged,
+  TriggerAllSettingsCallbacks,
 }
 
 export default MsgType;

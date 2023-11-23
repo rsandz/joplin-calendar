@@ -5,5 +5,6 @@ module.exports = {
   collectCoverage: true,
   moduleNameMapper: {
     "@constants/(.*)": "<rootDir>/src/constants/$1",
+    "api/(.*)": "<rootDir>/api/$1",
   },
 };
