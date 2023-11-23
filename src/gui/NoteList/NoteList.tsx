@@ -33,6 +33,10 @@ const TodayButton = styled(Button)`
   flex-grow: 0;
 `;
 
+const ListContainer = styled.div`
+  overflow-y: auto;
+`;
+
 const NoteListDate = styled(PlainText)`
   flex-grow: 2;
   flex-basis: 50%;
@@ -153,32 +157,34 @@ function NoteList(props: NoteListProps) {
           onSortDirectionClick={setSortDirection}
         />
       </ButtonBarContainer>
-      <NoteTypeHeader>Created Notes</NoteTypeHeader>
-      <NoteListItems
-        notes={createdNotesData ?? []}
-        selectedNoteId={selectedNote?.id}
-        sortBy={sortBy}
-        sortDirection={sortDirection}
-        key={`CreatedNotes:currentDate.toISOString()`}
-        primaryTextStrategy={(note) =>
-          `${moment(note.createdTime).format("LT")}`
-        }
-      />
-      {noteSearchTypes.includes(NoteSearchTypes.Modified) && (
-        <>
-          <NoteTypeHeader>Modified Notes</NoteTypeHeader>
-          <NoteListItems
-            notes={modifiedNotesData ?? []}
-            selectedNoteId={selectedNote?.id}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            key={`ModifiedNotes:currentDate.toISOString()`}
-            primaryTextStrategy={(note) =>
-              `${moment(note.updatedTime).format("LT")}`
-            }
-          />
-        </>
-      )}
+      <ListContainer>
+        <NoteTypeHeader>Created Notes</NoteTypeHeader>
+        <NoteListItems
+          notes={createdNotesData ?? []}
+          selectedNoteId={selectedNote?.id}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          key={`CreatedNotes:currentDate.toISOString()`}
+          primaryTextStrategy={(note) =>
+            `${moment(note.createdTime).format("LT")}`
+          }
+        />
+        {noteSearchTypes.includes(NoteSearchTypes.Modified) && (
+          <>
+            <NoteTypeHeader>Modified Notes</NoteTypeHeader>
+            <NoteListItems
+              notes={modifiedNotesData ?? []}
+              selectedNoteId={selectedNote?.id}
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              key={`ModifiedNotes:currentDate.toISOString()`}
+              primaryTextStrategy={(note) =>
+                `${moment(note.updatedTime).format("LT")}`
+              }
+            />
+          </>
+        )}
+      </ListContainer>
     </>
   );
 }

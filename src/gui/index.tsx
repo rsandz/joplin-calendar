@@ -186,6 +186,9 @@ const AppStyler = styled.div`
   font-size: var(--joplin-font-size);
   font-family: var(--joplin-font-family);
   margin: 0.25rem 0.5rem 0.25rem 0.5rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 `;
 
 const root = document.getElementById("joplin-plugin-content");

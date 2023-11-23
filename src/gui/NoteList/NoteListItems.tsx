@@ -9,6 +9,7 @@ import PlainText from "../StyledComponents/PlainText";
 
 const NoteListContainer = styled.ul`
   padding: 0;
+  margin: 0;
   outline: 0;
 `;
 
