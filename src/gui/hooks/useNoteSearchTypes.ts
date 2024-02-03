@@ -3,6 +3,7 @@ import MsgType from "@constants/messageTypes";
 import { useEffect, useState } from "react";
 import useWebviewApiOnMessage from "./useWebViewApiOnMessage";
 import { SHOW_MODIFIED_NOTES } from "@constants/Settings";
+import useOnSettingsChange from "./useOnSettingsChange";
 
 /**
  * Provides note types to search for when fetching notes, based on user preference.
@@ -10,38 +11,14 @@ import { SHOW_MODIFIED_NOTES } from "@constants/Settings";
  * Note type examples: Created Notes, Modified Notes
  */
 function useNoteSearchTypes() {
-  const [showModifiedNotes, setShowModifiedNotes] = useState(false);
+  const showModifiedNotes = useOnSettingsChange<boolean>(
+    SHOW_MODIFIED_NOTES,
+    false
+  );
   const noteSearchTypes = [NoteSearchTypes.Created];
   if (showModifiedNotes) {
     noteSearchTypes.push(NoteSearchTypes.Modified);
   }
-
-  // Trigger all settings callbacks once initialized
-  // to prevent any race conditions.
-  useEffect(() => {
-    webviewApi.postMessage({
-      type: MsgType.TriggerAllSettingsCallbacks,
-    });
-  }, []);
-
-  useWebviewApiOnMessage((data) => {
-    const message = data.message;
-
-    if (!message.type) {
-      return;
-    }
-    if (message.type !== MsgType.SettingChanged) {
-      return;
-    }
-
-    const settingMessage = message as any;
-
-    if (settingMessage.key !== SHOW_MODIFIED_NOTES) {
-      return;
-    }
-    setShowModifiedNotes((message as any).value);
-  });
-
   return noteSearchTypes;
 }
 
