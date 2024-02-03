@@ -1,7 +1,12 @@
 import joplin from "api";
 import { SettingItemType } from "api/types";
 import MsgType from "@constants/messageTypes";
-import { SHOW_CALENDAR_BUTTON, SHOW_MODIFIED_NOTES } from "@constants/Settings";
+import {
+  SHOW_CALENDAR_BUTTON,
+  SHOW_MODIFIED_NOTES,
+  WEEK_START_DAY,
+  WeekStartDay,
+} from "@constants/Settings";
 
 const SETTINGS_SECTION_ID = "joplinCalendarSection";
 
@@ -32,6 +37,16 @@ export async function registerSettings() {
       value: true,
       section: SETTINGS_SECTION_ID,
     },
+    [WEEK_START_DAY]: {
+      label: "Week Start Day",
+      description: "Which day the week starts on",
+      public: true,
+      isEnum: true,
+      type: SettingItemType.String,
+      options: WeekStartDay,
+      value: WeekStartDay.Sunday,
+      section: SETTINGS_SECTION_ID,
+    },
   });
 
   await joplin.settings.onChange(async ({ keys }) => {
@@ -41,6 +56,14 @@ export async function registerSettings() {
       });
     });
   });
+}
+
+/**
+ * Alerts panel when certain settings change.
+ */
+export async function registerPanelAlertOnSettingChange(panelHandle: string) {
+  await onSettingChangeAlertPanel(panelHandle, SHOW_MODIFIED_NOTES);
+  await onSettingChangeAlertPanel(panelHandle, WEEK_START_DAY);
 }
 
 export async function triggerAllSettingsCallbacks() {

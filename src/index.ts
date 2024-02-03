@@ -7,9 +7,9 @@ import {
   registerSettings,
   triggerAllSettingsCallbacks,
   onSettingChange,
-  onSettingChangeAlertPanel,
+  registerPanelAlertOnSettingChange,
 } from "./settings";
-import { SHOW_CALENDAR_BUTTON, SHOW_MODIFIED_NOTES } from "@constants/Settings";
+import { SHOW_CALENDAR_BUTTON } from "@constants/Settings";
 
 joplin.plugins.register({
   onStart: async function () {
@@ -33,7 +33,7 @@ joplin.plugins.register({
       }
     });
 
-    await onSettingChangeAlertPanel(panel, SHOW_MODIFIED_NOTES);
+    await registerPanelAlertOnSettingChange(panel);
 
     await triggerAllSettingsCallbacks();
   },
