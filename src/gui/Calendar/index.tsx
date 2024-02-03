@@ -15,6 +15,8 @@ import useGetMonthStatistics from "../hooks/useGetMonthStatistics";
 import MsgType from "@constants/messageTypes";
 import { PluginPostMessage } from "@constants/pluginMessageTypes";
 import useWebviewApiOnMessage from "../hooks/useWebViewApiOnMessage";
+import useOnSettingsChange from "../hooks/useOnSettingsChange";
+import { WEEK_START_DAY, WeekStartDay } from "@constants/Settings";
 
 const DAYS_IN_A_WEEK = 7;
 const CALENDAR_ROWS = 6;
@@ -78,16 +80,37 @@ function Calendar({
     [onKeyboardNavigation]
   );
 
+  const weekStartDay = useOnSettingsChange<WeekStartDay>(
+    WEEK_START_DAY,
+    WeekStartDay.Sunday
+  );
+
   const currentMonthFirstDay = shownMonth.startOf("month");
 
   const calendarBody: React.JSX.Element[] = [];
-  const firstRowOffset = -currentMonthFirstDay.weekday();
+  let firstRowBacktrackOffset;
+  if (weekStartDay === WeekStartDay.Monday) {
+    // If the current month starts on a day other than Monday, we need to backtrack.
+    // Monday has isoWeek 1, and we need to  backtrack 0 days.
+    // Tuesday has isoWeek 2, and we need to backtrack 1 days.
+    // ...
+    // Sunday has isoWeek 7, and we need to backtrack 6 days.
+    firstRowBacktrackOffset = currentMonthFirstDay.isoWeekday() - 1;
+  } else {
+    // Fallback to asssuming week starts on Sunday.
+    // If current month starts on a day other than Sunday, we need to backtrack.
+    // Monday has isoWeek 1, and we need to  backtrack 1 day.
+    // Tuesday has isoWeek 2, and we need to backtrack 2 days.
+    // ...
+    // Sunday has isoWeek 7, and we need to backtrack no days.
+    firstRowBacktrackOffset = currentMonthFirstDay.isoWeekday() % 7;
+  }
 
   // Note: Moment JS uses in place operations
   const workingDate = currentMonthFirstDay.clone();
 
   // Offset to fill in dates from previous month till first of current month.
-  workingDate.add(firstRowOffset, "days");
+  workingDate.subtract(firstRowBacktrackOffset, "days");
 
   for (let row = 0; row < CALENDAR_ROWS; row++) {
     const cols: React.JSX.Element[] = [];
