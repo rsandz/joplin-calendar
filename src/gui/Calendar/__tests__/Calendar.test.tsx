@@ -32,7 +32,7 @@ describe("calendar", () => {
     const date = moment("May-29-2023", "MMM-DD-YYYY");
     render(<Calendar selectedDate={date} />);
 
-    expect(screen.getByText("May, 2023")).toBeDefined();
+    expect(screen.getByText("May 2023")).toBeDefined();
 
     const cells = screen.getAllByRole("cell");
     expect(cells).toHaveLength(42); // 7 days * 6 rows

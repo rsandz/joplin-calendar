@@ -45,7 +45,7 @@ function CalendarControls({
           >
             {controlHeld ? <FaAnglesLeft /> : <FaAngleLeft />}
           </Button>
-          <CalendarDate>{shownMonth.format("MMM, YYYY")}</CalendarDate>
+          <CalendarDate>{shownMonth.format("MMM YYYY")}</CalendarDate>
           <Button
             onClick={controlHeld ? onNextYearClicked : onNextMonthClicked}
             aria-label="calendar-next"
