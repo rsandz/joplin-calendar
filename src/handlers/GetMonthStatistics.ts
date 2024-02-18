@@ -3,6 +3,7 @@ import MonthStatistics from "@constants/MonthStatistics";
 import {
   getCreatedNotesForDay,
   getModifiedNotesForDay,
+  getRelatedNotesForDay,
 } from "./GetNotesForDay";
 import Note from "@constants/Note";
 
@@ -60,4 +61,10 @@ export async function getMonthModifiedNoteStatistics(
   date: moment.Moment
 ): Promise<MonthStatistics> {
   return getMonthStatistics(date, getModifiedNotesForDay);
+}
+
+export async function getMonthRelatedNoteStatistics(
+  date: moment.Moment
+): Promise<MonthStatistics> {
+  return getMonthStatistics(date, getRelatedNotesForDay);
 }

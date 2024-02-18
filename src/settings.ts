@@ -4,9 +4,11 @@ import MsgType from "@constants/messageTypes";
 import {
   SHOW_CALENDAR_BUTTON,
   SHOW_MODIFIED_NOTES,
+  SHOW_RELATED_NOTES,
   WEEK_START_DAY,
   WeekStartDay,
 } from "@constants/Settings";
+import { getDateFormat } from "./handlers/GlobalSettings";
 
 const SETTINGS_SECTION_ID = "joplinCalendarSection";
 
@@ -37,6 +39,17 @@ export async function registerSettings() {
       value: true,
       section: SETTINGS_SECTION_ID,
     },
+    [SHOW_RELATED_NOTES]: {
+      label: "Show Related Notes in Note List",
+      description: `Show notes that have the date in the title. The Joplin date
+      format is used for this. Currently, it is set to: ${await getDateFormat()}. Note,
+      this feature is experimental and may impact performance with large
+      notebooks.`,
+      public: true,
+      type: SettingItemType.Bool,
+      value: false,
+      section: SETTINGS_SECTION_ID,
+    },
     [WEEK_START_DAY]: {
       label: "Week Start Day",
       description: "Which day the week starts on",
@@ -63,6 +76,7 @@ export async function registerSettings() {
  */
 export async function registerPanelAlertOnSettingChange(panelHandle: string) {
   await onSettingChangeAlertPanel(panelHandle, SHOW_MODIFIED_NOTES);
+  await onSettingChangeAlertPanel(panelHandle, SHOW_RELATED_NOTES);
   await onSettingChangeAlertPanel(panelHandle, WEEK_START_DAY);
 }
 

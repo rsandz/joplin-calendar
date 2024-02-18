@@ -84,6 +84,7 @@ function NoteList(props: NoteListProps) {
     if (message.type === MsgType.NoteChanged) {
       refetchCreatedNotes();
       refetchModifiedNotes();
+      refetchRelatedNotes();
       refetchSelectedNote();
     }
   });
@@ -116,6 +117,21 @@ function NoteList(props: NoteListProps) {
       });
     },
     enabled: noteSearchTypes.includes(NoteSearchTypes.Modified),
+  });
+
+  const { data: relatedNotesData, refetch: refetchRelatedNotes } = useQuery<
+    Note[]
+  >({
+    queryKey: ["notes", "related", currentDate.toISOString()],
+    queryFn: async () => {
+      console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
+      return await webviewApi.postMessage({
+        type: MsgType.GetNotes,
+        currentDate: currentDate.toISOString(),
+        noteSearchTypes: [NoteSearchTypes.Related],
+      });
+    },
+    enabled: noteSearchTypes.includes(NoteSearchTypes.Related),
   });
 
   const { data: selectedNote, refetch: refetchSelectedNote } = useQuery<Note>({
@@ -158,13 +174,28 @@ function NoteList(props: NoteListProps) {
         />
       </ButtonBarContainer>
       <ListContainer>
+        {noteSearchTypes.includes(NoteSearchTypes.Related) && (
+          <>
+            <NoteTypeHeader>Related Notes</NoteTypeHeader>
+            <NoteListItems
+              notes={relatedNotesData ?? []}
+              selectedNoteId={selectedNote?.id}
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              key={`RelatedNotes:{currentDate.toISOString()}`}
+              primaryTextStrategy={(note) =>
+                `${moment(note.createdTime).format("LT")}`
+              }
+            />{" "}
+          </>
+        )}
         <NoteTypeHeader>Created Notes</NoteTypeHeader>
         <NoteListItems
           notes={createdNotesData ?? []}
           selectedNoteId={selectedNote?.id}
           sortBy={sortBy}
           sortDirection={sortDirection}
-          key={`CreatedNotes:currentDate.toISOString()`}
+          key={`CreatedNotes:{currentDate.toISOString()}`}
           primaryTextStrategy={(note) =>
             `${moment(note.createdTime).format("LT")}`
           }
@@ -177,7 +208,7 @@ function NoteList(props: NoteListProps) {
               selectedNoteId={selectedNote?.id}
               sortBy={sortBy}
               sortDirection={sortDirection}
-              key={`ModifiedNotes:currentDate.toISOString()`}
+              key={`ModifiedNotes:{currentDate.toISOString()}`}
               primaryTextStrategy={(note) =>
                 `${moment(note.updatedTime).format("LT")}`
               }
