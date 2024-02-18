@@ -70,7 +70,7 @@ describe("NoteList", () => {
     postMessageMock.mockReturnValue([]);
     render(wrapper(<NoteList currentDate={moment()} />));
     await waitFor(() =>
-      expect(screen.getByText("No Notes Found")).toBeDefined()
+      expect(screen.getAllByText("No Notes Found")).toHaveLength(1)
     );
   });
 
@@ -109,9 +109,11 @@ describe("NoteList", () => {
         },
       });
     });
-    await waitFor(() => expect(screen.getByText("Test Title")).toBeDefined());
+    await waitFor(() =>
+      expect(screen.getAllByText("Test Title")).toHaveLength(1)
+    );
 
-    expect(screen.getByText("Test Title 2").parentElement).toHaveStyle(
+    expect(screen.getAllByText("Test Title 2")[0].parentElement).toHaveStyle(
       "background-color: var(--joplin-background-color-hover3);"
     );
   });

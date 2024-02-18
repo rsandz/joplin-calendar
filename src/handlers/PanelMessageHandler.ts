@@ -4,14 +4,17 @@ import moment from "moment";
 import {
   getNearestDayWithCreatedNote,
   getNearestDayWithModifiedNote,
+  getNearestDayWithRelatedNote,
 } from "./GetNearestDayWithNote";
 import {
   getMonthCreatedNoteStatistics,
   getMonthModifiedNoteStatistics,
+  getMonthRelatedNoteStatistics,
 } from "./GetMonthStatistics";
 import {
   getCreatedNotesForDay,
   getModifiedNotesForDay,
+  getRelatedNotesForDay,
 } from "./GetNotesForDay";
 import NoteSearchTypes from "@constants/NoteSearchTypes";
 import MonthStatistics from "@constants/MonthStatistics";
@@ -48,6 +51,13 @@ async function handleGetNotes(message) {
       ))
     );
   }
+  if (noteTypes.includes(NoteSearchTypes.Related)) {
+    notes.push(
+      ...(await getRelatedNotesForDay(
+        moment(message.currentDate, moment.ISO_8601)
+      ))
+    );
+  }
 
   const uniqueNotes = uniqBy(notes, (note) => note.id);
   return uniqueNotes;
@@ -79,6 +89,12 @@ async function handleGetMonthStatistics(message): Promise<MonthStatistics> {
     );
   }
 
+  if (noteTypes.includes(NoteSearchTypes.Related)) {
+    individualStatistics.push(
+      await getMonthRelatedNoteStatistics(moment(message.date, moment.ISO_8601))
+    );
+  }
+
   return individualStatistics.reduce(
     (prev, curr) => {
       const notesPerDay = prev.notesPerDay;
@@ -107,6 +123,25 @@ async function handleGetNearestDayWithNote(message) {
     return null;
   }
 
+  const candidateDateReducer = (responses) =>
+    responses.reduce((prev, curr) => {
+      if (!curr) {
+        return prev;
+      }
+      if (!prev) {
+        return curr;
+      }
+
+      const currDate = moment(curr.date, moment.ISO_8601);
+      const prevDate = moment(prev.date, moment.ISO_8601);
+
+      if (message.direction === "future") {
+        return currDate.isBefore(prevDate) ? curr : prev;
+      } else {
+        return currDate.isAfter(prevDate) ? curr : prev;
+      }
+    }, null);
+
   const candidateResponses: GetNearestDayWithNoteResponse[] = [];
 
   if (noteTypes.includes(NoteSearchTypes.Created)) {
@@ -126,19 +161,18 @@ async function handleGetNearestDayWithNote(message) {
     );
   }
 
-  return candidateResponses.reduce((prev, curr) => {
-    if (!curr) {
-      return prev;
-    }
-    if (!prev) {
-      return curr;
-    }
-    if (message.direction === "future") {
-      return curr.date < prev.date ? curr : prev;
-    } else {
-      return curr.date > prev.date ? curr : prev;
-    }
-  }, null);
+  if (noteTypes.includes(NoteSearchTypes.Related)) {
+    const earlyStopDate = candidateDateReducer(candidateResponses);
+    candidateResponses.push(
+      await getNearestDayWithRelatedNote(
+        moment(message.date, moment.ISO_8601),
+        message.direction,
+        earlyStopDate
+      )
+    );
+  }
+
+  return candidateDateReducer(candidateResponses);
 }
 
 /**
