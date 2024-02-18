@@ -2,3 +2,4 @@ dist/
 node_modules/
 publish/
 coverage/
+load_test/load_test_notes
