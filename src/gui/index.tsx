@@ -46,6 +46,7 @@ async function getNearestPastDayWithNote(
     type: MsgType.GetNearestDayWithNote,
     date: selectedDate.toISOString(),
     direction: "past",
+    noteSearchTypes,
   } as GetNearestDayWithNoteRequest);
 
   if (!response) {
@@ -117,7 +118,7 @@ function App() {
         setSelectedDate(selectedDate.clone().add(1, "week"));
       }
     },
-    [selectedDate, setSelectedDate]
+    [selectedDate, setSelectedDate, noteSearchTypes]
   );
 
   return (
