@@ -25,11 +25,17 @@ joplin.plugins.register({
 
     await onSettingChange(SHOW_CALENDAR_BUTTON, async (value) => {
       if (value) {
-        await joplin.views.toolbarButtons.create(
-          "calendarToggleButton",
-          TOGGLE_CALENDAR_COMMAND,
-          ToolbarButtonLocation.NoteToolbar
-        );
+        try {
+          await joplin.views.toolbarButtons.create(
+            "calendarToggleButton",
+            TOGGLE_CALENDAR_COMMAND,
+            ToolbarButtonLocation.NoteToolbar
+          );
+        } catch (e) {
+          // Joplin doesn't allow checking if a button already exists.
+          // This means button already exists and we don't need to do anything.
+          return;
+        }
       }
     });
 
