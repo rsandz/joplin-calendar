@@ -27,6 +27,7 @@ async function getNotesForDay(date: moment.Moment, operatorTerm: string) {
       page: page,
     });
     notes.push(...paginatedResponse.items);
+    page++;
   } while (paginatedResponse.has_more);
 
   return notes
