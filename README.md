@@ -9,9 +9,10 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 - The plugin includes a **calendar** and a **notes list**.
 
 ## 📆 Calendar
+
 - Clicking on a calendar date shows the notes created or updated on that date.
 - Clicking on the '<' and '>' buttons above the calendar moves between months.
-- Clicking on the '<' and '>' buttons above the calendar *while holding `ctrl`* moves between years.
+- Clicking on the '<' and '>' buttons above the calendar _while holding `ctrl`_ moves between years.
 - Calendar dates have dots beneath them indicating the number of notes written on that day.
   - Each dot represents 2 notes created, up to a maximum of 4 dots.
 
@@ -19,14 +20,18 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 > The create date and updated date for a note can be manually change by clicking on the "🛈" button.
 
 ## 🗒️ Notes List
-- The notes list shows notes created and updated on the specified date.
-  - Showing updated notes can be disabled in the settings.
+
+- The notes list shows notes created on the specified date.
+- The notes list can show notes updated on the specified date.
+  - This must be enabled in the settings.
+- The notes list can show notes related to the specified date. These are notes that have the date in the title of the note.
+  - This must be enabled in the settings.
+  - The Joplin date format is used when searching for related notes.
 - Navigate to the notes by clicking on the titles in the notes list.
 - Clicking on the '<' and '>' buttons above the notes list moves days.
-- Clicking on the '<' and '>' buttons above the notes list *while holding `ctrl`* moves between days with notes.
+- Clicking on the '<' and '>' buttons above the notes list _while holding `ctrl`_ moves between days with notes.
 - Clicking the `today` button brings back the calendar focus to the current day.
 - Notes can be sorted by time of creation, or alphabetically. The sort direction can also be changed.
-
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -46,6 +51,11 @@ This plugin for [Joplin](https://joplinapp.org/) adds a simple calendar which al
 ### After clicking on the Note List
 
 - Use up and down arrow keys to select notes.
+
+## 🛑 Limitations
+
+- Related notes is still an experimental feature - it will negatively impact performance with larger note books.
+- When searching for the nearest note with Related Notes ON, only related notes within the closest 120 days will be checked.
 
 # ⚙️ Development
 
