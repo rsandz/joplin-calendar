@@ -20,9 +20,11 @@ import {
 } from "react-icons/fa6";
 
 const ButtonBarContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
 `;
 
 const DateButtonBar = styled(ButtonBar)`
