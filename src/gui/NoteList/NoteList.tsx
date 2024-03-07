@@ -84,6 +84,7 @@ function NoteList(props: NoteListProps) {
     if (message.type === MsgType.NoteChanged) {
       refetchCreatedNotes();
       refetchModifiedNotes();
+      refetchDueNotes();
       refetchRelatedNotes();
       refetchSelectedNote();
     }
@@ -117,6 +118,19 @@ function NoteList(props: NoteListProps) {
       });
     },
     enabled: noteSearchTypes.includes(NoteSearchTypes.Modified),
+  });
+
+  const { data: dueNotesData, refetch: refetchDueNotes } = useQuery<Note[]>({
+    queryKey: ["notes", "due", currentDate.toISOString()],
+    queryFn: async () => {
+      console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
+      return await webviewApi.postMessage({
+        type: MsgType.GetNotes,
+        currentDate: currentDate.toISOString(),
+        noteSearchTypes: [NoteSearchTypes.Due],
+      });
+    },
+    enabled: noteSearchTypes.includes(NoteSearchTypes.Due),
   });
 
   const { data: relatedNotesData, refetch: refetchRelatedNotes } = useQuery<
@@ -211,6 +225,22 @@ function NoteList(props: NoteListProps) {
               key={`ModifiedNotes:{currentDate.toISOString()}`}
               primaryTextStrategy={(note) =>
                 `${moment(note.updatedTime).format("LT")}`
+              }
+            />
+          </>
+        )}
+
+        {noteSearchTypes.includes(NoteSearchTypes.Dued) && (
+          <>
+            <NoteTypeHeader>Due Notes</NoteTypeHeader>
+            <NoteListItems
+              notes={dueNotesData ?? []}
+              selectedNoteId={selectedNote?.id}
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              key={`DuedNotes:{currentDate.toISOString()}`}
+              primaryTextStrategy={(note) =>
+                `${moment(note.dueTime).format("LT")}`
               }
             />
           </>

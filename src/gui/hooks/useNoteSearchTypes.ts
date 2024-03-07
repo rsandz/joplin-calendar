@@ -1,8 +1,9 @@
 import NoteSearchTypes from "@constants/NoteSearchTypes";
-import MsgType from "@constants/messageTypes";
-import { useEffect, useState } from "react";
-import useWebviewApiOnMessage from "./useWebViewApiOnMessage";
-import { SHOW_MODIFIED_NOTES, SHOW_RELATED_NOTES } from "@constants/Settings";
+import {
+  SHOW_DUE_NOTES,
+  SHOW_MODIFIED_NOTES,
+  SHOW_RELATED_NOTES,
+} from "@constants/Settings";
 import useOnSettingsChange from "./useOnSettingsChange";
 
 /**
@@ -15,6 +16,7 @@ function useNoteSearchTypes() {
     SHOW_MODIFIED_NOTES,
     false
   );
+  const showDueNotes = useOnSettingsChange<boolean>(SHOW_DUE_NOTES, true);
   const showRelatedNotes = useOnSettingsChange<boolean>(
     SHOW_RELATED_NOTES,
     false
@@ -25,6 +27,9 @@ function useNoteSearchTypes() {
 
   if (showModifiedNotes) {
     noteSearchTypes.push(NoteSearchTypes.Modified);
+  }
+  if (showDueNotes) {
+    noteSearchTypes.push(NoteSearchTypes.Due);
   }
   if (showRelatedNotes) {
     noteSearchTypes.push(NoteSearchTypes.Related);
