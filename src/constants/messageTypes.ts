@@ -10,6 +10,7 @@ export enum MsgType {
   NoteChanged,
   SettingChanged,
   TriggerAllSettingsCallbacks,
+  GetJoplinDateFormat,
 }
 
 export default MsgType;

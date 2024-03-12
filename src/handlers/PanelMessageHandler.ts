@@ -21,6 +21,7 @@ import MonthStatistics from "@constants/MonthStatistics";
 import { GetNearestDayWithNoteResponse } from "@constants/GetNearestDayWithNote";
 import { uniqBy } from "lodash";
 import { triggerAllSettingsCallbacks } from "../settings";
+import { getDateFormat } from "./GlobalSettings";
 
 async function openNote(id: string) {
   joplin.commands.execute("openNote", id);
@@ -208,6 +209,10 @@ async function handlePanelMessage(message) {
 
     case MsgType.TriggerAllSettingsCallbacks: {
       return await triggerAllSettingsCallbacks();
+    }
+
+    case MsgType.GetJoplinDateFormat: {
+      return await getDateFormat();
     }
 
     default: {

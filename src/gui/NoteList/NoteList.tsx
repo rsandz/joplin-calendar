@@ -78,6 +78,15 @@ function NoteList(props: NoteListProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(
     props.defaultSortDirection ?? "ascending"
   );
+  const [currentDateFormat, setCurrentDateFormat] = useState("MMM D, YYYY");
+
+  webviewApi
+    .postMessage({
+      type: MsgType.GetJoplinDateFormat,
+    })
+    .then((joplinDateFormat) => {
+      setCurrentDateFormat(joplinDateFormat);
+    });
 
   const noteSearchTypes = useNoteSearchTypes();
 
@@ -159,7 +168,7 @@ function NoteList(props: NoteListProps) {
               <FaChevronLeft />
             )}
           </Button>
-          <NoteListDate>{currentDate.format("MMM D, YYYY")}</NoteListDate>
+          <NoteListDate>{currentDate.format(currentDateFormat)}</NoteListDate>
           <Button
             onClick={controlHeld ? onNextNoteDayClick : onNextDayClick}
             aria-label="note-list-next"
