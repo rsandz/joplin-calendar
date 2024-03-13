@@ -23,7 +23,13 @@ async function getNotesForDay(date: moment.Moment, operatorTerm: string) {
   let paginatedResponse: Record<string, any>;
   do {
     paginatedResponse = await joplin.data.get(["search"], {
-      fields: ["id", "title", "user_created_time", "user_updated_time"],
+      fields: [
+        "id",
+        "title",
+        "user_created_time",
+        "user_updated_time",
+        "due_time",
+      ],
       query: `${operatorTerm}:${fromDate} -${operatorTerm}:${toDate}`,
       page: page,
     });
@@ -45,6 +51,10 @@ export async function getModifiedNotesForDay(date: moment.Moment) {
   return getNotesForDay(date, "updated");
 }
 
+export async function getDueNotesForDay(date: moment.Moment) {
+  return getNotesForDay(date, "due");
+}
+
 /**
  * Gets list of related notes for a specific day.
  * Related notes are notes that have the day in the title.
@@ -58,7 +68,13 @@ export async function getRelatedNotesForDay(date: moment.Moment) {
   let paginatedResponse: Record<string, any>;
   do {
     paginatedResponse = await joplin.data.get(["search"], {
-      fields: ["id", "title", "user_created_time", "user_updated_time"],
+      fields: [
+        "id",
+        "title",
+        "user_created_time",
+        "user_updated_time",
+        "due_time",
+      ],
       query: `title:/"${dateString}"`,
       page: page,
     });

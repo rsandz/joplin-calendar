@@ -9,11 +9,13 @@ import {
 import {
   getMonthCreatedNoteStatistics,
   getMonthModifiedNoteStatistics,
+  getMonthDueNoteStatistics,
   getMonthRelatedNoteStatistics,
 } from "./GetMonthStatistics";
 import {
   getCreatedNotesForDay,
   getModifiedNotesForDay,
+  getDueNotesForDay,
   getRelatedNotesForDay,
 } from "./GetNotesForDay";
 import NoteSearchTypes from "@constants/NoteSearchTypes";
@@ -49,6 +51,11 @@ async function handleGetNotes(message) {
       ...(await getModifiedNotesForDay(
         moment(message.currentDate, moment.ISO_8601)
       ))
+    );
+  }
+  if (noteTypes.includes(NoteSearchTypes.Due)) {
+    notes.push(
+      ...(await getDueNotesForDay(moment(message.currentDate, moment.ISO_8601)))
     );
   }
   if (noteTypes.includes(NoteSearchTypes.Related)) {

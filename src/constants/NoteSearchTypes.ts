@@ -5,6 +5,7 @@ enum NoteSearchTypes {
   Created,
   Modified,
   Related,
+  Due,
 }
 
 export default NoteSearchTypes;

@@ -20,5 +20,6 @@ export function convertEpochDateInNoteToIsoString(note: Note): Note {
     ...note,
     createdTime: moment(note.createdTime).toISOString(),
     updatedTime: moment(note.updatedTime).toISOString(),
+    dueTime: moment(note.dueTime).toISOString(),
   };
 }
