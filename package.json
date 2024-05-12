@@ -6,7 +6,10 @@
     "prepare": "husky install && npm run dist",
     "update": "npm install -g generator-joplin && yo joplin --update",
     "watch": "npx npm-watch",
-    "test": "jest"
+    "test": "jest",
+    "preversion": "npm test",
+    "preversion:manifest": "replace '\\d+\\.\\d+\\.\\d+' \"$npm_package_version\" ./src/manifest.json",
+    "version": "npm run preversion:manifest && git add ./src/manifest.json"
   },
   "license": "MIT",
   "keywords": [
@@ -35,6 +38,7 @@
     "on-build-webpack": "^0.1.0",
     "prettier": "2.8.8",
     "react-test-renderer": "^18.2.0",
+    "replace": "^1.2.2",
     "tar": "^6.0.5",
     "ts-jest": "^29.1.0",
     "ts-loader": "^7.0.5",
