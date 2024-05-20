@@ -32,7 +32,13 @@ async function getNearestDayWithNote(
   }
 
   const response = await joplin.data.get(["search"], {
-    fields: ["id", "title", "user_created_time", "user_updated_time"],
+    fields: [
+      "id",
+      "title",
+      "user_created_time",
+      "user_updated_time",
+      "due_time",
+    ],
     limit: 1,
     order_by: orderByTerm,
     order_dir: direction === "past" ? "DESC" : "ASC",
@@ -114,7 +120,13 @@ export async function getNearestDayWithRelatedNote(
     const dateString = workingDate.format(dateFormat);
 
     const response = await joplin.data.get(["search"], {
-      fields: ["id", "title", "user_created_time", "user_updated_time"],
+      fields: [
+        "id",
+        "title",
+        "user_created_time",
+        "user_updated_time",
+        "due_time",
+      ],
       limit: 1,
       query: `title:/"${dateString}"`,
     });
