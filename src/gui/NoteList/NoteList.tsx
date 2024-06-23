@@ -18,13 +18,14 @@ import {
   FaChevronRight,
   FaRightToBracket,
 } from "react-icons/fa6";
+import useSelectedNote from "../hooks/useSelectedNote";
 
 const ButtonBarContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
 `;
 
 const DateButtonBar = styled(ButtonBar)`
@@ -87,7 +88,6 @@ function NoteList(props: NoteListProps) {
       refetchCreatedNotes();
       refetchModifiedNotes();
       refetchRelatedNotes();
-      refetchSelectedNote();
     }
   });
 
@@ -136,14 +136,7 @@ function NoteList(props: NoteListProps) {
     enabled: noteSearchTypes.includes(NoteSearchTypes.Related),
   });
 
-  const { data: selectedNote, refetch: refetchSelectedNote } = useQuery<Note>({
-    queryKey: ["selectedNote"],
-    queryFn: async () => {
-      return await webviewApi.postMessage({
-        type: MsgType.GetSelectedNote,
-      });
-    },
-  });
+  const { selectedNote } = useSelectedNote();
 
   return (
     <>

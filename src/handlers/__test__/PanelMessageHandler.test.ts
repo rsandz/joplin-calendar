@@ -2,7 +2,7 @@ import MsgType from "@constants/messageTypes";
 import {
   getCreatedNotesForDay,
   getModifiedNotesForDay,
-} from "../GetNotesForDay";
+} from "../search/GetNotesForDay";
 import moment from "moment";
 import handlePanelMessage from "../PanelMessageHandler";
 import joplin from "api";
@@ -11,13 +11,13 @@ import NoteSearchTypes from "@constants/NoteSearchTypes";
 import {
   getMonthCreatedNoteStatistics,
   getMonthModifiedNoteStatistics,
-} from "../GetMonthStatistics";
+} from "../search/GetMonthStatistics";
 import MonthStatistics from "@constants/MonthStatistics";
 import { result } from "lodash";
 import {
   getNearestDayWithCreatedNote,
   getNearestDayWithModifiedNote,
-} from "../GetNearestDayWithNote";
+} from "../search/GetNearestDayWithNote";
 import { triggerAllSettingsCallbacks } from "../../settings";
 
 jest.mock(
@@ -26,16 +26,19 @@ jest.mock(
     commands: {
       execute: jest.fn(),
     },
+    settings: {
+      value: jest.fn(),
+    },
   }),
   { virtual: true }
 );
 const mockedJoplin = jest.mocked(joplin);
 
-jest.mock("../GetNotesForDay");
+jest.mock("../search/GetNotesForDay");
 const mockedGetCreatedNotesForDay = jest.mocked(getCreatedNotesForDay);
 const mockedGetModifiedNotesForDay = jest.mocked(getModifiedNotesForDay);
 
-jest.mock("../GetMonthStatistics");
+jest.mock("../search/GetMonthStatistics");
 const mockedGetMonthCreatedNoteStatistics = jest.mocked(
   getMonthCreatedNoteStatistics
 );
@@ -43,7 +46,7 @@ const mockedGetMonthModifiedNoteStatistics = jest.mocked(
   getMonthModifiedNoteStatistics
 );
 
-jest.mock("../GetNearestDayWithNote");
+jest.mock("../search/GetNearestDayWithNote");
 const mockedGetNearestDayWithCreatedNote = jest.mocked(
   getNearestDayWithCreatedNote
 );
@@ -59,6 +62,7 @@ const mockedTriggerAllSettingsCallbacks = jest.mocked(
 describe("PanelMessageHandler", () => {
   const mockNote1: Note = {
     id: "TestId",
+    parent_id: "TestNoteBook",
     title: "TestTitle",
     createdTime: "1970-01-01T00:00:00.000Z",
     updatedTime: "1970-01-01T00:00:00.000Z",

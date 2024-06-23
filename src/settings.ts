@@ -2,6 +2,7 @@ import joplin from "api";
 import { SettingItemType } from "api/types";
 import MsgType from "@constants/messageTypes";
 import {
+  FILTER_NOTES_BY_NOTEBOOK,
   SHOW_CALENDAR_BUTTON,
   SHOW_MODIFIED_NOTES,
   SHOW_RELATED_NOTES,
@@ -50,6 +51,15 @@ export async function registerSettings() {
       value: false,
       section: SETTINGS_SECTION_ID,
     },
+    [FILTER_NOTES_BY_NOTEBOOK]: {
+      label: "Filter Notes by Notebook",
+      description: `If enabled, the note list will only show notes in the selected notebook.  
+      Note: Selecting "All Notes" will NOT show notes from all note books, just the previously selected one.`,
+      public: true,
+      type: SettingItemType.Bool,
+      value: false,
+      section: SETTINGS_SECTION_ID,
+    },
     [WEEK_START_DAY]: {
       label: "Week Start Day",
       description: "Which day the week starts on",
@@ -77,6 +87,7 @@ export async function registerSettings() {
 export async function registerPanelAlertOnSettingChange(panelHandle: string) {
   await onSettingChangeAlertPanel(panelHandle, SHOW_MODIFIED_NOTES);
   await onSettingChangeAlertPanel(panelHandle, SHOW_RELATED_NOTES);
+  await onSettingChangeAlertPanel(panelHandle, FILTER_NOTES_BY_NOTEBOOK);
   await onSettingChangeAlertPanel(panelHandle, WEEK_START_DAY);
 }
 

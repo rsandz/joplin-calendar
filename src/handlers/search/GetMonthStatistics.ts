@@ -6,6 +6,12 @@ import {
   getRelatedNotesForDay,
 } from "./GetNotesForDay";
 import Note from "@constants/Note";
+import { SearchConstraints } from "./SearchConstraints";
+
+type NoteForDayRetriever = (
+  date: moment.Moment,
+  searchConstraints?: SearchConstraints
+) => Promise<Note[]>;
 
 /**
  * Get stastistics for each day in a month.
@@ -16,7 +22,8 @@ import Note from "@constants/Note";
  */
 export async function getMonthStatistics(
   date: moment.Moment,
-  noteForDayRetriever: (date: moment.Moment) => Promise<Note[]>
+  noteForDayRetriever: NoteForDayRetriever,
+  searchConstraints?: SearchConstraints
 ): Promise<MonthStatistics> {
   const dateWithNoTime = date.startOf("day");
   const fromDate = dateWithNoTime.clone().startOf("month");
@@ -28,7 +35,8 @@ export async function getMonthStatistics(
   const monthNotesPromises: Record<string, Promise<any>> = {};
   while (!workingDate.isAfter(toDate)) {
     monthNotesPromises[workingDate.format("L")] = noteForDayRetriever(
-      workingDate.clone()
+      workingDate.clone(),
+      searchConstraints
     );
     workingDate.add(1, "day");
   }
@@ -52,19 +60,22 @@ export async function getMonthStatistics(
 }
 
 export async function getMonthCreatedNoteStatistics(
-  date: moment.Moment
+  date: moment.Moment,
+  searchConstraints?: SearchConstraints
 ): Promise<MonthStatistics> {
-  return getMonthStatistics(date, getCreatedNotesForDay);
+  return getMonthStatistics(date, getCreatedNotesForDay, searchConstraints);
 }
 
 export async function getMonthModifiedNoteStatistics(
-  date: moment.Moment
+  date: moment.Moment,
+  searchConstraints?: SearchConstraints
 ): Promise<MonthStatistics> {
-  return getMonthStatistics(date, getModifiedNotesForDay);
+  return getMonthStatistics(date, getModifiedNotesForDay, searchConstraints);
 }
 
 export async function getMonthRelatedNoteStatistics(
-  date: moment.Moment
+  date: moment.Moment,
+  searchConstraints?: SearchConstraints
 ): Promise<MonthStatistics> {
-  return getMonthStatistics(date, getRelatedNotesForDay);
+  return getMonthStatistics(date, getRelatedNotesForDay, searchConstraints);
 }

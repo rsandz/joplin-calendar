@@ -1,5 +1,4 @@
-import NoteSearchTypes from "@constants/NoteSearchTypes";
-import handlePanelMessage from "../PanelMessageHandler";
+import handlePanelMessage from "../../PanelMessageHandler";
 import MsgType from "@constants/messageTypes";
 import joplin from "api";
 import moment from "moment";
@@ -7,8 +6,9 @@ import {
   getNearestDayWithModifiedNote,
   getNearestDayWithRelatedNote,
 } from "../GetNearestDayWithNote";
-import { getDateFormat } from "../GlobalSettings";
+import { getDateFormat } from "../../GlobalSettings";
 import _ from "lodash";
+import { settings } from "cluster";
 
 jest.mock(
   "api",
@@ -16,12 +16,15 @@ jest.mock(
     data: {
       get: jest.fn(),
     },
+    settings: {
+      value: jest.fn(),
+    },
   }),
   { virtual: true }
 );
 const mockedJoplin = jest.mocked(joplin);
 
-jest.mock("../GlobalSettings");
+jest.mock("../../GlobalSettings");
 const mockedGetDateFormat = jest.mocked(getDateFormat);
 
 describe("GetNearestDayWithNote", () => {
@@ -147,7 +150,9 @@ describe("GetNearestDayWithNote", () => {
 });
 
 describe("Get Nearest Related Note", () => {
-  mockedGetDateFormat.mockResolvedValue("YYYY/MM/DD");
+  beforeEach(() => {
+    mockedGetDateFormat.mockResolvedValue("YYYY/MM/DD");
+  });
 
   const apiReturnNote = Object.freeze({
     id: "testId",

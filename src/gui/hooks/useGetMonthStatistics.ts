@@ -3,6 +3,8 @@ import NoteSearchTypes from "@constants/NoteSearchTypes";
 import MsgType from "@constants/messageTypes";
 import { useQuery } from "@tanstack/react-query";
 import { Moment } from "moment";
+import useSelectedNote from "./useSelectedNote";
+import { useEffect, useState } from "react";
 
 function useGetMonthStatistics(
   month: Moment,
@@ -19,6 +21,18 @@ function useGetMonthStatistics(
       });
     },
   });
+
+  const { selectedNote } = useSelectedNote();
+  const [currentParentId, setCurrentParentId] = useState("");
+
+  useEffect(() => {
+    // If selected notebook changes, fetch statistics again.
+    if (selectedNote && selectedNote.parent_id != currentParentId) {
+      setCurrentParentId(selectedNote.parent_id);
+      refetch();
+    }
+  });
+
   return { data, refetch };
 }
 
