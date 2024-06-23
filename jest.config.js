@@ -7,4 +7,5 @@ module.exports = {
     "@constants/(.*)": "<rootDir>/src/constants/$1",
     "api/(.*)": "<rootDir>/api/$1",
   },
+  clearMocks: true,
 };

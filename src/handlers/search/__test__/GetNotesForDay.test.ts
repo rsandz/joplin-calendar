@@ -2,9 +2,11 @@ import joplin from "api";
 import moment from "moment";
 import {
   getCreatedNotesForDay,
+  getModifiedNotesForDay,
   getRelatedNotesForDay,
 } from "../GetNotesForDay";
-import { getDateFormat } from "../GlobalSettings";
+import { getDateFormat } from "../../GlobalSettings";
+import { SearchConstraints } from "../SearchConstraints";
 
 jest.mock(
   "api",
@@ -13,14 +15,21 @@ jest.mock(
       get: jest.fn(async () => ({
         items: [],
       })),
+      settings: {
+        value: jest.fn(),
+      },
     },
   }),
   { virtual: true }
 );
 const mockedJoplin = jest.mocked(joplin);
 
-jest.mock("../GlobalSettings");
+jest.mock("../../GlobalSettings");
 const mockedGetDateFormat = jest.mocked(getDateFormat);
+
+const testSearchConstraints: SearchConstraints = {
+  notebook: "testNotebook",
+};
 
 describe("Get Notes For Day", () => {
   it("calls joplin api with the correct query", async () => {
@@ -78,7 +87,7 @@ describe("Get Notes For Day", () => {
             user_updated_time: 0,
           },
         ],
-        has_more: true,
+        has_more: false,
       }));
 
     const result = await getCreatedNotesForDay(moment("2023-05-29"));
@@ -100,7 +109,9 @@ describe("Get Notes For Day", () => {
 });
 
 describe("Get Related Notes for day", () => {
-  mockedGetDateFormat.mockResolvedValue("YYYY/MM/DD");
+  beforeEach(() => {
+    mockedGetDateFormat.mockResolvedValue("YYYY/MM/DD");
+  });
 
   it("calls joplin api with the correct query", async () => {
     await getRelatedNotesForDay(moment("2023-05-29"));
@@ -133,5 +144,36 @@ describe("Get Related Notes for day", () => {
       createdTime: "1970-01-01T00:00:00.000Z",
       updatedTime: "1970-01-01T00:00:00.000Z",
     });
+  });
+
+  it.each([
+    [getCreatedNotesForDay],
+    [getModifiedNotesForDay],
+    [getRelatedNotesForDay],
+  ])("returns multiple notes correctly - %s", async (getNotesForDay) => {
+    mockedJoplin.data.get.mockImplementationOnce(async () => ({
+      items: [
+        {
+          id: "testId",
+          title: "testTitle",
+          user_created_time: 0,
+          user_updated_time: 0,
+        },
+      ],
+      has_more: false,
+    }));
+
+    const result = await getNotesForDay(
+      moment("2023-05-29"),
+      testSearchConstraints
+    );
+
+    expect(result).toHaveLength(1);
+    expect(joplin.data.get).toHaveBeenCalledWith(
+      ["search"],
+      expect.objectContaining({
+        query: expect.stringContaining('notebook:"testNotebook"'),
+      })
+    );
   });
 });

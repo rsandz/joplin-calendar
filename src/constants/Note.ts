@@ -3,6 +3,7 @@
  */
 interface Note {
   id: string;
+  parent_id: string;
   title: string;
   createdTime: string;
   updatedTime: string;

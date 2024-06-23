@@ -5,22 +5,23 @@ import {
   getNearestDayWithCreatedNote,
   getNearestDayWithModifiedNote,
   getNearestDayWithRelatedNote,
-} from "./GetNearestDayWithNote";
+} from "./search/GetNearestDayWithNote";
 import {
   getMonthCreatedNoteStatistics,
   getMonthModifiedNoteStatistics,
   getMonthRelatedNoteStatistics,
-} from "./GetMonthStatistics";
+} from "./search/GetMonthStatistics";
 import {
   getCreatedNotesForDay,
   getModifiedNotesForDay,
   getRelatedNotesForDay,
-} from "./GetNotesForDay";
+} from "./search/GetNotesForDay";
 import NoteSearchTypes from "@constants/NoteSearchTypes";
 import MonthStatistics from "@constants/MonthStatistics";
 import { GetNearestDayWithNoteResponse } from "@constants/GetNearestDayWithNote";
 import { uniqBy } from "lodash";
 import { triggerAllSettingsCallbacks } from "../settings";
+import { buildSearchConstraints } from "./search/SearchConstraints";
 
 async function openNote(id: string) {
   joplin.commands.execute("openNote", id);
@@ -36,25 +37,30 @@ async function handleGetNotes(message) {
     return null;
   }
 
+  const searchConstraints = await buildSearchConstraints();
+
   const notes = [];
   if (noteTypes.includes(NoteSearchTypes.Created)) {
     notes.push(
       ...(await getCreatedNotesForDay(
-        moment(message.currentDate, moment.ISO_8601)
+        moment(message.currentDate, moment.ISO_8601),
+        searchConstraints
       ))
     );
   }
   if (noteTypes.includes(NoteSearchTypes.Modified)) {
     notes.push(
       ...(await getModifiedNotesForDay(
-        moment(message.currentDate, moment.ISO_8601)
+        moment(message.currentDate, moment.ISO_8601),
+        searchConstraints
       ))
     );
   }
   if (noteTypes.includes(NoteSearchTypes.Related)) {
     notes.push(
       ...(await getRelatedNotesForDay(
-        moment(message.currentDate, moment.ISO_8601)
+        moment(message.currentDate, moment.ISO_8601),
+        searchConstraints
       ))
     );
   }
@@ -75,23 +81,32 @@ async function handleGetMonthStatistics(message): Promise<MonthStatistics> {
 
   const individualStatistics: MonthStatistics[] = [];
 
+  const searchConstraints = await buildSearchConstraints();
+
   if (noteTypes.includes(NoteSearchTypes.Created)) {
     individualStatistics.push(
-      await getMonthCreatedNoteStatistics(moment(message.date, moment.ISO_8601))
+      await getMonthCreatedNoteStatistics(
+        moment(message.date, moment.ISO_8601),
+        searchConstraints
+      )
     );
   }
 
   if (noteTypes.includes(NoteSearchTypes.Modified)) {
     individualStatistics.push(
       await getMonthModifiedNoteStatistics(
-        moment(message.date, moment.ISO_8601)
+        moment(message.date, moment.ISO_8601),
+        searchConstraints
       )
     );
   }
 
   if (noteTypes.includes(NoteSearchTypes.Related)) {
     individualStatistics.push(
-      await getMonthRelatedNoteStatistics(moment(message.date, moment.ISO_8601))
+      await getMonthRelatedNoteStatistics(
+        moment(message.date, moment.ISO_8601),
+        searchConstraints
+      )
     );
   }
 
@@ -123,6 +138,8 @@ async function handleGetNearestDayWithNote(message) {
     return null;
   }
 
+  const searchConstraints = await buildSearchConstraints();
+
   const candidateDateReducer = (responses) =>
     responses.reduce((prev, curr) => {
       if (!curr) {
@@ -148,7 +165,8 @@ async function handleGetNearestDayWithNote(message) {
     candidateResponses.push(
       await getNearestDayWithCreatedNote(
         moment(message.date, moment.ISO_8601),
-        message.direction
+        message.direction,
+        searchConstraints
       )
     );
   }
@@ -156,7 +174,8 @@ async function handleGetNearestDayWithNote(message) {
     candidateResponses.push(
       await getNearestDayWithModifiedNote(
         moment(message.date, moment.ISO_8601),
-        message.direction
+        message.direction,
+        searchConstraints
       )
     );
   }
@@ -167,7 +186,8 @@ async function handleGetNearestDayWithNote(message) {
       await getNearestDayWithRelatedNote(
         moment(message.date, moment.ISO_8601),
         message.direction,
-        earlyStopDate
+        earlyStopDate,
+        searchConstraints
       )
     );
   }
