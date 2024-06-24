@@ -30,8 +30,6 @@ export async function getMonthStatistics(
   const workingDate = fromDate.clone();
   const toDate = dateWithNoTime.clone().endOf("month");
 
-  console.debug(`Fetching stats from ${fromDate} to ${toDate}`);
-
   const monthNotesPromises: Record<string, Promise<any>> = {};
   while (!workingDate.isAfter(toDate)) {
     monthNotesPromises[workingDate.format("L")] = noteForDayRetriever(

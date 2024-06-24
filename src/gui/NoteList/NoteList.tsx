@@ -96,7 +96,6 @@ function NoteList(props: NoteListProps) {
   >({
     queryKey: ["notes", "created", currentDate.toISOString()],
     queryFn: async () => {
-      console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
       return await webviewApi.postMessage({
         type: MsgType.GetNotes,
         currentDate: currentDate.toISOString(),
@@ -111,7 +110,6 @@ function NoteList(props: NoteListProps) {
   >({
     queryKey: ["notes", "modified", currentDate.toISOString()],
     queryFn: async () => {
-      console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
       return await webviewApi.postMessage({
         type: MsgType.GetNotes,
         currentDate: currentDate.toISOString(),
@@ -126,7 +124,6 @@ function NoteList(props: NoteListProps) {
   >({
     queryKey: ["notes", "related", currentDate.toISOString()],
     queryFn: async () => {
-      console.debug(`Requesting notes for ${currentDate.toLocaleString()}`);
       return await webviewApi.postMessage({
         type: MsgType.GetNotes,
         currentDate: currentDate.toISOString(),

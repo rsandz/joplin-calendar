@@ -13,7 +13,6 @@ function useGetMonthStatistics(
   const { data, refetch } = useQuery<MonthStatistics>({
     queryKey: ["monthStatistics", month.format("MMYYYY")],
     queryFn: async () => {
-      console.debug(`Fetching month statistics for ${month.toLocaleString()}`);
       return await webviewApi.postMessage({
         type: MsgType.GetMonthStatistics,
         date: month.toISOString(),

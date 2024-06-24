@@ -290,7 +290,6 @@ describe("NoteList", () => {
         ];
       }
       if (options.noteSearchTypes.includes(NoteSearchTypes.Modified)) {
-        console.error("THIS");
         return [
           {
             id: "testId2",
