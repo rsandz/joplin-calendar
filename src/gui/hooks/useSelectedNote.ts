@@ -16,7 +16,10 @@ function useSelectedNote() {
 
   useWebviewApiOnMessage((data) => {
     const message = data.message;
-    if (message.type === MsgType.NoteChanged) {
+    if (
+      message.type === MsgType.NoteChanged ||
+      message.type === MsgType.SettingChanged
+    ) {
       refetch();
     }
   });

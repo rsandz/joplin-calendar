@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Moment } from "moment";
 import useSelectedNote from "./useSelectedNote";
 import { useEffect, useState } from "react";
+import useWebviewApiOnMessage from "./useWebViewApiOnMessage";
 
 function useGetMonthStatistics(
   month: Moment,
@@ -28,6 +29,13 @@ function useGetMonthStatistics(
     // If selected notebook changes, fetch statistics again.
     if (selectedNote && selectedNote.parent_id != currentParentId) {
       setCurrentParentId(selectedNote.parent_id);
+      refetch();
+    }
+  });
+
+  useWebviewApiOnMessage((data) => {
+    const message = data.message;
+    if (message.type === MsgType.SettingChanged) {
       refetch();
     }
   });

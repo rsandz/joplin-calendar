@@ -84,7 +84,10 @@ function NoteList(props: NoteListProps) {
 
   useWebviewApiOnMessage((data) => {
     const message = data.message;
-    if (message.type === MsgType.NoteChanged) {
+    if (
+      message.type === MsgType.NoteChanged ||
+      message.type === MsgType.SettingChanged
+    ) {
       refetchCreatedNotes();
       refetchModifiedNotes();
       refetchRelatedNotes();

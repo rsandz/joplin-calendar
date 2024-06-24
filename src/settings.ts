@@ -10,6 +10,7 @@ import {
   WeekStartDay,
 } from "@constants/Settings";
 import { getDateFormat } from "./handlers/GlobalSettings";
+import { FILTER_BY_NOTEBOOK_COMMAND } from "./commands";
 
 const SETTINGS_SECTION_ID = "joplinCalendarSection";
 
@@ -54,7 +55,8 @@ export async function registerSettings() {
     [FILTER_NOTES_BY_NOTEBOOK]: {
       label: "Filter Notes by Notebook",
       description: `If enabled, the note list will only show notes in the selected notebook.  
-      Note: Selecting "All Notes" will NOT show notes from all note books, just the previously selected one.`,
+      Note: Selecting "All Notes" will NOT show notes from all note books, just the previously selected one.
+      This setting can also be toggled using the ${FILTER_BY_NOTEBOOK_COMMAND} command.`,
       public: true,
       type: SettingItemType.Bool,
       value: false,
